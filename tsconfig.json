@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist",
+
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    "module": "commonjs",
+    "declaration": true,
+    "experimentalDecorators": true,
+
+    "target": "ES2023",
+
+    "sourceMap": true,
+    "incremental": true,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "allowJs": false
+  },
+
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
