@@ -1,4 +1,10 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
 @Controller()
-export class AppController {}
+class AppController {
+  @Get()
+  public getHello(): string {
+    return "Hello world!";
+  }
+}
+export default AppController;

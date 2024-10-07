@@ -1,30 +1,32 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AdministratorModule } from './administrator/administrator.module';
-import { ModeratorModule } from './moderator/moderator.module';
-import { CustomerModule } from './customer/customer.module';
-import { EmailVerificationModule } from './email-verification/email-verification.module';
-import { CartModule } from './cart/cart.module';
-import { OrderItemModule } from './order-item/order-item.module';
-import { OrderModule } from './order/order.module';
-import { ProductModule } from './product/product.module';
+import AppController from './app.controller';
+import AppService from './app.service';
+import AppAllExceptionsFilter from './filters/app.all.exceptions.filter';
+import DatabaseModule from './database/database.module';
+import DomainModule from './domain/domain.module';
+import UtilsModule from './utils/utils.module';
+import appConfig from './app.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    AdministratorModule,
-    ModeratorModule,
-    CustomerModule,
-    EmailVerificationModule,
-    CartModule,
-    OrderItemModule,
-    OrderModule,
-    ProductModule,
+    ConfigModule.forRoot({
+      load: [appConfig],
+      envFilePath: ['.env', `.env.${process.env.NODE_ENV}`]
+    }),
+    DatabaseModule,
+    UtilsModule,
+    DomainModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [ AppController ],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AppAllExceptionsFilter
+    }
+  ],
 })
-export class AppModule {}
+class AppModule {}
+export default AppModule;
