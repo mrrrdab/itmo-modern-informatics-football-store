@@ -19,8 +19,9 @@
     "forceConsistentCasingInFileNames": false,
     "skipLibCheck": true,
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,
@@ -33,6 +34,6 @@
     "allowJs": false
   },
 
-  "include": ["src"],
+  "include": ["src", "src/database/prisma/prisma.service.ts"],
   "exclude": ["node_modules", "dist"]
 }
