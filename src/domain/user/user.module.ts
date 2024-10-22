@@ -1,14 +1,20 @@
 import { Module } from '@nestjs/common';
-import AdministratorModule from './administrator/administrator.module';
-import ModeratorModule from './moderator/moderator.module';
-import CustomerModule from './customer/customer.module';
+import UserController from './user.controller';
+import UserService from './user.service';
+import UserAggregate from './user.aggregate';
+import PrismaModule from '@/database/prisma/prisma.module';
+import CryptoModule from '@/utils/lib/crypto/crypto.module';
+import JWTModule from '@/utils/lib/jwt/jwt.module';
 
 @Module({
   imports: [
-    AdministratorModule,
-    ModeratorModule,
-    CustomerModule
-  ]
+    PrismaModule,
+    CryptoModule,
+    JWTModule
+  ],
+  controllers: [UserController],
+  providers: [UserService, UserAggregate],
+  exports: [UserService, UserAggregate]
 })
-class UserModule {}
+class UserModule { }
 export default UserModule;

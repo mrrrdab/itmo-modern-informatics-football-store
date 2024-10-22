@@ -1,14 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Res, Req, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { CreateOrderDTO, UpdateOrderDTO } from './dto';
 import OrderService from './order.service';
+import AuthGuard from '../auth/guards/auth.guard';
+import RoleGuard from '../auth/guards/role.guard';
+import UseRole from '@/utils/decorators/role.decorator';
 
+@ApiTags('orders')
 @Controller('orders')
+@UseGuards(AuthGuard, RoleGuard)
+@UseRole(Role.CUSTOMER)
 class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  findAll(@Res() res: Response) {
+    res.status(200).send({});
   }
 
   @Get(':id')

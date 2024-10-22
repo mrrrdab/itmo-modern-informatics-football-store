@@ -2,11 +2,17 @@ import { Module } from '@nestjs/common';
 import PrismaModule from '@/database/prisma/prisma.module';
 import CartController from './cart.controller';
 import CartService from './cart.service';
+import JWTModule from '@/utils/lib/jwt/jwt.module';
+import UserModule from '../user/user.module';
 
 @Module({
-  imports: [ PrismaModule ],
+  imports: [
+    PrismaModule,
+    JWTModule,
+    UserModule
+  ],
   controllers: [CartController],
-  providers: [CartService ],
+  providers: [CartService],
 })
-class CartModule {}
+class CartModule { }
 export default CartModule;

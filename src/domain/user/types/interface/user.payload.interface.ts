@@ -1,6 +1,10 @@
+import { Role } from '@prisma/client';
+
 interface IUserPayload {
   id: string;
   email: string;
-  name: string;
+  firstName?: string;
+  lastName?: string;
+  role: Role;
 }
 export default IUserPayload;

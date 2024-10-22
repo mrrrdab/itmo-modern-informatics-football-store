@@ -1,8 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { CreateCartDTO, UpdateCartDTO } from './dto';
 import CartService from './cart.service';
+import AuthGuard from '../auth/guards/auth.guard';
+import RoleGuard from '../auth/guards/role.guard';
+import UseRole from '@/utils/decorators/role.decorator';
 
+@ApiTags('carts')
 @Controller('carts')
+@UseGuards(AuthGuard, RoleGuard)
+@UseRole(Role.CUSTOMER)
 class CartController {
   constructor(private readonly cartService: CartService) {}
 
