@@ -21,10 +21,11 @@ import { ProductService } from './product.service';
 @ApiTags('Products')
 @Controller('api/products')
 @UseGuards(AuthGuard, RoleGuard)
-@UseRole(Role.MODERATOR)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @UseRole(Role.CUSTOMER)
+  @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Get all Products',
   })
@@ -38,6 +39,8 @@ export class ProductController {
     return this.productService.findAll();
   }
 
+  @UseRole(Role.CUSTOMER)
+  @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Get Product by Id',
   })
@@ -52,6 +55,7 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
+  @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Create product',
   })
@@ -66,6 +70,7 @@ export class ProductController {
     return this.productService.create(createProductDTO);
   }
 
+  @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Update Existing Product',
   })
@@ -81,6 +86,7 @@ export class ProductController {
     return this.productService.update(id, updateProductDTO);
   }
 
+  @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Delete product',
   })
