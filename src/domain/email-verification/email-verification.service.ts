@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, EmailVerification } from '@prisma/client';
-import PrismaService from '@/database/prisma/prisma.service';
-import EmailVerifCreateDTO from './validation/dto/email-verification.create.dto';
-import EmailVerifUpdateDTO from './validation/dto/email-verification.update.dto';
+
+import { PrismaService } from '@/database/prisma';
+
+import { EmailVerifCreateDTO, EmailVerifUpdateDTO } from './dto';
 
 @Injectable()
-class EmailVerifService {
+export class EmailVerifService {
   constructor(private readonly prismaService: PrismaService) {}
 
   public async getMany(params: Prisma.EmailVerificationFindManyArgs) {
@@ -13,13 +14,11 @@ class EmailVerifService {
     return emailVerifications;
   }
 
-  public async getByUniqueParams(
-    uniqueParams: Prisma.EmailVerificationFindUniqueArgs
-  ): Promise<EmailVerification> {
+  public async getByUniqueParams(uniqueParams: Prisma.EmailVerificationFindUniqueArgs): Promise<EmailVerification> {
     const emailVerif = await this.prismaService.emailVerification.findUnique(uniqueParams);
 
     if (!emailVerif) {
-      throw new NotFoundException("Запись о запрашиваемой верификации не найдена");
+      throw new NotFoundException('Requested verification record not found');
     }
 
     return emailVerif;
@@ -27,28 +26,24 @@ class EmailVerifService {
 
   public async create(emailVerifCreateData: EmailVerifCreateDTO): Promise<EmailVerification> {
     const newEmailVerif = await this.prismaService.emailVerification.create({
-      data: emailVerifCreateData
+      data: emailVerifCreateData,
     });
 
     return newEmailVerif;
   }
 
-  public async update(
-    emailVerifId: string,
-    emailVerifUpdateData: EmailVerifUpdateDTO
-  ): Promise<EmailVerification> {
+  public async update(emailVerifId: string, emailVerifUpdateData: EmailVerifUpdateDTO): Promise<EmailVerification> {
     const updatedEmailVerif = await this.prismaService.emailVerification.update({
       where: {
-        id: emailVerifId
+        id: emailVerifId,
       },
-      data: emailVerifUpdateData
+      data: emailVerifUpdateData,
     });
 
     if (!updatedEmailVerif) {
-      throw new NotFoundException("Верификация с заданным id не найдена");
+      throw new NotFoundException('Verification with the given id was not found');
     }
 
     return updatedEmailVerif;
   }
 }
-export default EmailVerifService;

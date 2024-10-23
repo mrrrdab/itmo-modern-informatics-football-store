@@ -2,24 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { User, Role } from '@prisma/client';
 import cron from 'node-cron';
-import JWTProvider from '@/utils/lib/jwt/jwt.provider';
-import UserService from '../user/user.service';
-import EmailVerifService from '../email-verification/email-verification.service';
-import CustomerService from '../user/entity/customer/customer.service';
-import IUserPayload from '../user/types/interface/user.payload.interface';
-import AuthData from './types/auth.data.type';
-import PasswordChar from './types/enum/password.char.enum';
-import JWT from '@/utils/lib/jwt/types/enum/jwt.enum';
+
+import { JWT, JWTProvider } from '@/utils';
+
+import { IUserPayload } from '../user/types';
+import { UserService } from '../user/user.service';
+import { CustomerService } from '../user/entity/customer/customer.service';
+import { EmailVerifService } from '../email-verification/email-verification.service';
+
+import { AuthData, PasswordChar } from './types';
 
 @Injectable()
-class AuthService {
+export class AuthService {
   private readonly passwordSpecialChars: string = '@$!%*#?&';
 
   constructor(
     private readonly jwtProvider: JWTProvider,
     private readonly userService: UserService,
     private readonly emailVerifService: EmailVerifService,
-    private readonly customerService: CustomerService
+    private readonly customerService: CustomerService,
   ) {
     this.scheduleCleanupNotVerifData();
   }
@@ -34,12 +35,12 @@ class AuthService {
     const nonActivatedAccounts = await this.emailVerifService.getMany({
       where: {
         user: {
-          isVerified: false
-        }
-      }
+          isVerified: false,
+        },
+      },
     });
 
-    nonActivatedAccounts.forEach(async (nonActivatedAccount) => {
+    nonActivatedAccounts.forEach(async (nonActivatedAccount: any) => {
       if (new Date(nonActivatedAccount.expiresAt) < new Date()) {
         await this.userService.remove(nonActivatedAccount.userId);
       }
@@ -50,14 +51,14 @@ class AuthService {
     const userPayload: IUserPayload = {
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     };
 
     if (userPayload.role === Role.CUSTOMER) {
       const customer = await this.customerService.getByUniqueParams({
         where: {
-          userId: user.id
-        }
+          userId: user.id,
+        },
       });
 
       userPayload.firstName = customer.firstName;
@@ -67,13 +68,14 @@ class AuthService {
     const accessToken = this.jwtProvider.generateJWT(userPayload, JWT.access);
     const refreshToken = this.jwtProvider.generateJWT(userPayload, JWT.refresh);
 
-    res.cookie(JWT.access, accessToken, this.jwtProvider.createJWTCookie(JWT.access))
+    res
+      .cookie(JWT.access, accessToken, this.jwtProvider.createJWTCookie(JWT.access))
       .cookie(JWT.refresh, refreshToken, this.jwtProvider.createJWTCookie(JWT.refresh));
 
     return {
       userPayload: userPayload,
       access: accessToken,
-      refresh: refreshToken
+      refresh: refreshToken,
     };
   }
 
@@ -82,15 +84,11 @@ class AuthService {
 
     switch (passwordChar) {
       case PasswordChar.lower:
-        resultPart.push(...Array.from(
-          { length }, () => String.fromCharCode(Math.floor(Math.random() * 26) + 97)
-        ));
+        resultPart.push(...Array.from({ length }, () => String.fromCharCode(Math.floor(Math.random() * 26) + 97)));
         break;
 
       case PasswordChar.upper:
-        resultPart.push(...Array.from(
-          { length }, () => String.fromCharCode(Math.floor(Math.random() * 26) + 65)
-        ));
+        resultPart.push(...Array.from({ length }, () => String.fromCharCode(Math.floor(Math.random() * 26) + 65)));
         break;
 
       case PasswordChar.digit:
@@ -98,15 +96,15 @@ class AuthService {
         break;
 
       case PasswordChar.special:
-        resultPart.push(...Array.from(
-          { length }, () => this.passwordSpecialChars[
-            Math.floor(Math.random() * this.passwordSpecialChars.length)
-          ]
-        ));
+        resultPart.push(
+          ...Array.from(
+            { length },
+            () => this.passwordSpecialChars[Math.floor(Math.random() * this.passwordSpecialChars.length)],
+          ),
+        );
         break;
     }
 
     return resultPart;
   }
 }
-export default AuthService;

@@ -1,27 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import NodeENV from '@/utils/node/types/enum/node.env.enum';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
+import { NodeENV } from '@/utils/node';
+
 @Injectable()
-class TransporterSettings {
+export class TransporterSettings {
   private readonly settings: Record<NodeENV, SMTPTransport.Options> = {
     dev: {
       secure: false,
       requireTLS: true,
       tls: {
-        rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     },
     prod: {
       secure: true,
       tls: {
-        rejectUnauthorized: true
-      }
-    }
+        rejectUnauthorized: true,
+      },
+    },
   };
 
-  constructor(private readonly configService: ConfigService) { }
+  constructor(private readonly configService: ConfigService) {}
 
   getSettings(nodeENV: NodeENV): SMTPTransport.Options {
     return {
@@ -30,9 +31,8 @@ class TransporterSettings {
       service: this.configService.get('EMAIL_SERVICE'),
       auth: {
         user: this.configService.get('EMAIL_USERNAME'),
-        pass: this.configService.get('EMAIL_PASSWORD')
-      }
+        pass: this.configService.get('EMAIL_PASSWORD'),
+      },
     };
   }
 }
-export default TransporterSettings;

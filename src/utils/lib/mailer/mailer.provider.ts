@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Transporter, createTransport } from 'nodemailer';
-import MailerConfig from './mailer.config';
+
+import { MailerConfig } from './mailer.config';
 
 @Injectable()
-class MailerProvider {
+export class MailerProvider {
   private readonly mailerTransporter: Transporter;
 
   constructor(private readonly mailerConfig: MailerConfig) {
@@ -14,4 +15,3 @@ class MailerProvider {
     return this.mailerTransporter;
   }
 }
-export default MailerProvider;

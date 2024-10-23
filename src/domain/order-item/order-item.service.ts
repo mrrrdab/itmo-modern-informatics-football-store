@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+
+import { PrismaService } from '@/database/prisma';
+
 import { CreateOrderItemDTO, UpdateOrderItemDTO } from './dto';
-import PrismaService from '@/database/prisma/prisma.service';
 
 @Injectable()
-class OrderItemService {
+export class OrderItemService {
   constructor(private readonly prismaService: PrismaService) {}
 
   findAll() {
@@ -26,4 +28,3 @@ class OrderItemService {
     return;
   }
 }
-export default OrderItemService;
