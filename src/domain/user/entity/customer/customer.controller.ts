@@ -7,6 +7,7 @@ import { AuthGuard, RoleGuard } from '@/domain/auth/guards';
 import { UseRole } from '@/utils';
 
 import { CustomerService } from './customer.service';
+import { CustomerGetDTO } from './dto';
 
 @ApiTags('Customers')
 @Controller('api/customers')
@@ -15,20 +16,20 @@ export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @ApiOperation({ summary: 'Get all Customers' })
-  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: [CustomerGetDTO] })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @UseGuards(RoleGuard)
   @UseRole(Role.ADMINISTRATOR)
   @Get()
-  public async getAll(@Res() res: Response): Promise<void> {
+  public async getAll(@Res() res: Response): Promise<CustomerGetDTO[]> {
     const customers = await this.customerService.getMany({});
-    res.status(200).json(customers);
+    return customers;
   }
 
   @ApiOperation({ summary: 'Get Customer by Id' })
-  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: CustomerGetDTO })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
   @ApiResponse({ status: 404, description: 'Not Found' })
@@ -43,13 +44,13 @@ export class CustomerController {
   @UseGuards(RoleGuard)
   @UseRole(Role.ADMINISTRATOR)
   @Get(':customerId')
-  public async getUniqueById(@Param('customerId') customerId: string, @Res() res: Response): Promise<void> {
+  public async getUniqueById(@Param('customerId') customerId: string, @Res() res: Response): Promise<CustomerGetDTO> {
     const customer = await this.customerService.getByUniqueParams({
       where: {
         id: customerId,
       },
     });
 
-    res.status(200).json(customer);
+    return customer;
   }
 }

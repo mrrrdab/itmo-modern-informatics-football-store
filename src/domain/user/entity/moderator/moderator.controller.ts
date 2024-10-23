@@ -10,7 +10,7 @@ import { UserService } from '../../user.service';
 import { AdminService } from '../administrator';
 
 import { ModeratorService } from './moderator.service';
-import { ModeratorCreateDTO } from './dto';
+import { ModeratorCreateDTO, ModeratorGetDTO } from './dto';
 
 @ApiTags('Moderators')
 @Controller('api/moderators')
@@ -24,14 +24,14 @@ export class ModeratorController {
   ) {}
 
   @ApiOperation({ summary: 'Get all Moderators' })
-  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: [ModeratorGetDTO] })
   @ApiResponse({ status: 401, description: 'The user is not authorized in the system' })
   @ApiResponse({ status: 403, description: 'The user is not authorized in the system as an administrator' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get()
-  public async getAll(@Res() res: Response): Promise<void> {
+  public async getAll(@Res() res: Response): Promise<ModeratorGetDTO[]> {
     const moderators = await this.moderatorService.getMany({});
-    res.status(200).json(moderators);
+    return moderators;
   }
 
   @ApiOperation({ summary: 'Get Moderator by Id' })
@@ -42,20 +42,23 @@ export class ModeratorController {
     required: true,
     description: 'Moderator Id',
   })
-  @ApiResponse({ status: 200, description: 'Moderator details' })
+  @ApiResponse({ status: 200, description: 'Moderator details', type: ModeratorGetDTO })
   @ApiResponse({ status: 401, description: 'The user is not authorized in the system' })
   @ApiResponse({ status: 403, description: 'The user is not authorized in the system as an administrator' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get(':moderatorId')
-  public async getUniqueById(@Param('moderatorId') moderatorId: string, @Res() res: Response): Promise<void> {
+  public async getUniqueById(
+    @Param('moderatorId') moderatorId: string,
+    @Res() res: Response,
+  ): Promise<ModeratorGetDTO> {
     const moderator = await this.moderatorService.getByUniqueParams({
       where: {
         id: moderatorId,
       },
     });
 
-    res.status(200).json(moderator);
+    return moderator;
   }
 
   @ApiOperation({ summary: 'Register Moderator' })

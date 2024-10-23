@@ -8,7 +8,7 @@ import { UseRole } from '@/utils';
 import { AuthGuard, RoleGuard } from '../auth/guards';
 
 import { UserService } from './user.service';
-import { UserCreateDTO } from './dto';
+import { UserCreateDTO, UserGetDTO } from './dto';
 
 @ApiTags('Users')
 @Controller('api/users')
@@ -18,14 +18,14 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: 'Get all Users' })
-  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: [UserGetDTO] })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get()
-  public async getAll(@Res() res: Response): Promise<void> {
+  public async getAll(@Res() res: Response): Promise<UserGetDTO[]> {
     const users = await this.userService.getMany({});
-    res.status(200).json(users);
+    return users;
   }
 
   @ApiOperation({ summary: 'Get User by Id' })
@@ -34,20 +34,20 @@ export class UserController {
     required: true,
     description: 'User id',
   })
-  @ApiResponse({ status: 200, description: 'User Details' })
+  @ApiResponse({ status: 200, description: 'User Details', type: UserGetDTO })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get(':userId')
-  public async getUniqueById(@Param('userId') userId: string, @Res() res: Response): Promise<void> {
+  public async getUniqueById(@Param('userId') userId: string, @Res() res: Response): Promise<UserGetDTO> {
     const user = await this.userService.getByUniqueParams({
       where: {
         id: userId,
       },
     });
 
-    res.status(200).json(user);
+    return user;
   }
 
   @ApiOperation({ summary: 'Register User' })
