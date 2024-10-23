@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "license": "UNLICENSED",
-  "author": "Maria Belogolovkina <> (https://github.com/mrrrdab), Sakhabutdinov Rustam <> (https://github.com/RustamOper05), Soloviev Egor <egor_spaik05@mail.ru> (https://github.com/Ingaleee), Nozdryakov Bogdan <voyagerbvb@gmail.com> (https://github.com/djsjah)",
-  "description": "Веб-приложение для покупок футбольной атрибутики",
+  "description": "Football Merchandise Web Application",
   "keywords": [
     "nestjs",
     "express",

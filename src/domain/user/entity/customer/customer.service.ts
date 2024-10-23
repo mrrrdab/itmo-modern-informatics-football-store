@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Customer } from '@prisma/client';
-import PrismaService from '@/database/prisma/prisma.service';
-import CustomerCreateDTO from './validation/dto/customer.create.dto';
+
+import { PrismaService } from '@/database/prisma';
+
+import { CustomerCreateDTO } from './dto';
 
 @Injectable()
-class CustomerService {
+export class CustomerService {
   constructor(private readonly prismaService: PrismaService) {}
 
   public async getMany(params: Prisma.CustomerFindManyArgs): Promise<Customer[]> {
@@ -16,7 +18,7 @@ class CustomerService {
     const customer = await this.prismaService.customer.findUnique(uniqueParams);
 
     if (!customer) {
-      throw new NotFoundException("Покупатель по заданным параметрам не найден");
+      throw new NotFoundException('Customer Not Found');
     }
 
     return customer;
@@ -24,10 +26,9 @@ class CustomerService {
 
   public async create(customerCreateData: CustomerCreateDTO): Promise<Customer> {
     const newCustomer = await this.prismaService.customer.create({
-      data: customerCreateData
+      data: customerCreateData,
     });
 
     return newCustomer;
   }
 }
-export default CustomerService;

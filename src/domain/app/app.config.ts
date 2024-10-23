@@ -1,6 +1,7 @@
-import { Express, Request } from 'express';
-import IUserPayload from '../user/types/interface/user.payload.interface';
-import NodeENV from '@/utils/node/types/enum/node.env.enum';
+/* eslint-disable @typescript-eslint/no-namespace */
+import { NodeENV } from '@/utils';
+
+import { IUserPayload } from '../user';
 
 declare global {
   namespace Express {
@@ -11,14 +12,14 @@ declare global {
 }
 
 export default () => ({
-  nodeENV: process.env.NODE_ENV as NodeENV || NodeENV.dev,
+  nodeENV: (process.env.NODE_ENV as NodeENV) || NodeENV.dev,
   protocol: process.env.PROTOCOL || 'http',
   host: process.env.HOST || 'localhost',
   port: parseInt(process.env.PORT as string, 10) || 3000,
   database: {
     main: {
       host: process.env.DATABASE_HOST || 'localhost',
-      port: parseInt(process.env.DATABASE_PORT as string, 10) || 5432
-    }
-  }
+      port: parseInt(process.env.DATABASE_PORT as string, 10) || 5432,
+    },
+  },
 });

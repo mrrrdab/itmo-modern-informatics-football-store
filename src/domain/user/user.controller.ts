@@ -2,76 +2,75 @@ import { Controller, Post, Get, Param, Body, Res, UseGuards } from '@nestjs/comm
 import { Response } from 'express';
 import { Role } from '@prisma/client';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
-import UserService from './user.service';
-import UserCreateDTO from './validation/dto/user.create.dto';
-import AuthGuard from '../auth/guards/auth.guard';
-import RoleGuard from '../auth/guards/role.guard';
-import UseRole from '@/utils/decorators/role.decorator';
 
-@ApiTags('users')
-@Controller('users')
+import { UseRole } from '@/utils';
+
+import { AuthGuard, RoleGuard } from '../auth/guards';
+
+import { UserService } from './user.service';
+import { UserCreateDTO, UserGetDTO } from './dto';
+
+@ApiTags('Users')
+@Controller('api/users')
 @UseGuards(AuthGuard, RoleGuard)
 @UseRole(Role.ADMINISTRATOR)
-class UserController {
+export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: "Получить всех пользователей" })
-  @ApiResponse({ status: 200, description: 'Список всех пользователей' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiOperation({ summary: 'Get all Users' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: [UserGetDTO] })
+  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get()
-  public async getAll(@Res() res: Response): Promise<void> {
+  public async getAll(): Promise<UserGetDTO[]> {
     const users = await this.userService.getMany({});
-    res.status(200).json(users);
+    return users;
   }
 
-  @ApiOperation({ summary: "Получить пользователя по его id" })
+  @ApiOperation({ summary: 'Get User by Id' })
   @ApiParam({
     name: 'userId',
     required: true,
-    description: "id пользователя"
+    description: 'User id',
   })
-  @ApiResponse({ status: 200, description: 'Детали пользователя' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiResponse({ status: 200, description: 'User Details', type: UserGetDTO })
+  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
+  @ApiResponse({ status: 404, description: 'Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get(':userId')
-  public async getUniqueById(@Param('userId') userId: string, @Res() res: Response): Promise<void> {
+  public async getUniqueById(@Param('userId') userId: string): Promise<UserGetDTO> {
     const user = await this.userService.getByUniqueParams({
       where: {
-        id: userId
-      }
+        id: userId,
+      },
     });
 
-    res.status(200).json(user);
+    return user;
   }
 
-  @ApiOperation({ summary: "Зарегистрировать пользователя" })
-  @ApiResponse({ status: 200, description: 'Пользователь успешно зарегистрирован' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiOperation({ summary: 'Register User' })
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @ApiBody({
     type: UserCreateDTO,
     examples: {
-      "User - Moderator": {
+      'User - Moderator': {
         value: {
-          email: "st1035@mail.ru",
+          email: 'st1035@mail.ru',
           password: 'lejklgHKJS9018!?',
-          role: 'MODERATOR'
-        }
-      }
-    }
+          role: 'MODERATOR',
+        },
+      },
+    },
   })
   @Post()
-  public async create(
-    @Body() userCreateData: UserCreateDTO,
-    @Res() res: Response
-  ): Promise<Response | void> {
+  public async create(@Body() userCreateData: UserCreateDTO, @Res() res: Response): Promise<Response | void> {
     if (userCreateData.role !== Role.MODERATOR) {
-      return res.status(400).send("Вы можете зарегистрировать только модератора");
+      return res.status(400).send('You can only register a moderator');
     }
 
     userCreateData.isVerified = true;
@@ -79,8 +78,7 @@ class UserController {
 
     res.status(200).json({
       data: newUser,
-      message: "Пользователь успешно зарегистрирован"
+      message: 'User registered successfully',
     });
   }
 }
-export default UserController;

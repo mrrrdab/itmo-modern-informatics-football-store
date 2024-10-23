@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
-import PrismaService from '@/database/prisma/prisma.service';
-import CryptoProvider from '@/utils/lib/crypto/crypto.provider';
-import UserCreateDTO from './validation/dto/user.create.dto';
-import UserSystemUpdateDTO from './validation/dto/user.system.update.dto';
-import UserUpdateDTO from './validation/dto/user.update.dto';
+
+import { PrismaService } from '@/database/prisma';
+import { CryptoProvider } from '@/utils';
+
+import { UserCreateDTO, UserSystemUpdateDTO, UserUpdateDTO } from './dto';
 
 @Injectable()
-class UserService {
+export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly crypto: CryptoProvider
+    private readonly crypto: CryptoProvider,
   ) {}
 
   public async getMany(params: Prisma.UserFindManyArgs) {
@@ -22,7 +22,7 @@ class UserService {
     const user = await this.prismaService.user.findUnique(uniqueParams);
 
     if (!user) {
-      throw new NotFoundException("Пользователь по заданным параметрам не найден");
+      throw new NotFoundException('User Not Found');
     }
 
     return user;
@@ -31,7 +31,7 @@ class UserService {
   public async create(userCreateData: UserCreateDTO): Promise<User> {
     userCreateData.password = await this.crypto.hashStringBySHA256(userCreateData.password);
     const newUser = await this.prismaService.user.create({
-      data: userCreateData
+      data: userCreateData,
     });
 
     return newUser;
@@ -40,13 +40,13 @@ class UserService {
   public async update(userId: string, userUpdateData: UserSystemUpdateDTO | UserUpdateDTO): Promise<User> {
     const updatedUser = await this.prismaService.user.update({
       where: {
-        id: userId
+        id: userId,
       },
-      data: userUpdateData
+      data: userUpdateData,
     });
 
     if (!updatedUser) {
-      throw new NotFoundException("Пользователь с заданным id не найден");
+      throw new NotFoundException('User with the given id not found');
     }
 
     return updatedUser;
@@ -55,9 +55,8 @@ class UserService {
   public async remove(userId: string): Promise<void> {
     await this.prismaService.user.delete({
       where: {
-        id: userId
-      }
+        id: userId,
+      },
     });
   }
 }
-export default UserService;

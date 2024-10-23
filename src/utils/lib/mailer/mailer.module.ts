@@ -1,18 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import MailerConfig from './mailer.config';
-import MailerProvider from './mailer.provider';
-import TransporterSettings from './transporter.settings';
-import NodeModule from '@/utils/node/node.module';
+
+import { NodeModule } from '@/utils/node/node.module';
+
+import { MailerConfig } from './mailer.config';
+import { MailerProvider } from './mailer.provider';
+import { TransporterSettings } from './transporter.settings';
 
 @Module({
-  imports : [ ConfigModule, NodeModule ],
-  providers: [
-    TransporterSettings,
-    MailerConfig,
-    MailerProvider
-  ],
-  exports: [ MailerProvider ]
+  imports: [ConfigModule, NodeModule],
+  providers: [TransporterSettings, MailerConfig, MailerProvider],
+  exports: [MailerProvider],
 })
-class MailerModule { }
-export default MailerModule;
+export class MailerModule {}

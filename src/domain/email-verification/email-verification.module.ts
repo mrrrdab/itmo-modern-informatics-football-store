@@ -1,19 +1,17 @@
 import { Module } from '@nestjs/common';
-import PrismaModule from '@/database/prisma/prisma.module';
-import EmailVerifController from './email-verification.controller';
-import EmailVerifService from './email-verification.service';
-import JWTModule from '@/utils/lib/jwt/jwt.module';
-import UserModule from '../user/user.module';
+
+import { PrismaModule } from '@/database/prisma';
+import { JWTModule } from '@/utils';
+
+import { UserModule } from '../user';
+
+import { EmailVerifService } from './email-verification.service';
+import { EmailVerifController } from './email-verification.controller';
 
 @Module({
-  imports: [
-    PrismaModule,
-    JWTModule,
-    UserModule
-  ],
-  controllers: [ EmailVerifController ],
-  providers: [ EmailVerifService ],
-  exports: [ EmailVerifService ]
+  imports: [PrismaModule, JWTModule, UserModule],
+  controllers: [EmailVerifController],
+  providers: [EmailVerifService],
+  exports: [EmailVerifService],
 })
-class EmailVerifModule {}
-export default EmailVerifModule;
+export class EmailVerifModule {}

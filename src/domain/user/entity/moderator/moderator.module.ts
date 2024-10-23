@@ -1,20 +1,18 @@
 import { Module } from '@nestjs/common';
-import PrismaModule from '@/database/prisma/prisma.module';
-import ModeratorController from './moderator.controller';
-import ModeratorService from './moderator.service';
-import JWTModule from '@/utils/lib/jwt/jwt.module';
-import UserModule from '../../user.module';
-import AdminModule from '../administrator/admin.module';
+
+import { PrismaModule } from '@/database/prisma';
+import { JWTModule } from '@/utils';
+
+import { AdminModule } from '../administrator';
+import { UserModule } from '../../user.module';
+
+import { ModeratorController } from './moderator.controller';
+import { ModeratorService } from './moderator.service';
 
 @Module({
-  imports: [
-    PrismaModule,
-    JWTModule,
-    AdminModule,
-    UserModule
-  ],
+  imports: [PrismaModule, JWTModule, AdminModule, UserModule],
   controllers: [ModeratorController],
   providers: [ModeratorService],
+  exports: [ModeratorService],
 })
-class ModeratorModule { }
-export default ModeratorModule;
+export class ModeratorModule {}

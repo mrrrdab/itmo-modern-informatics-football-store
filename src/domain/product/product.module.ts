@@ -1,18 +1,16 @@
 import { Module } from '@nestjs/common';
-import PrismaModule from '@/database/prisma/prisma.module';
-import ProductController from './product.controller';
-import ProductService from './product.service';
-import JWTModule from '@/utils/lib/jwt/jwt.module';
-import UserModule from '../user/user.module';
+
+import { PrismaModule, PrismaService } from '@/database/prisma';
+import { JWTModule } from '@/utils';
+
+import { UserModule, ModeratorModule } from '../user';
+
+import { ProductService } from './product.service';
+import { ProductController } from './product.controller';
 
 @Module({
-  imports: [
-    PrismaModule,
-    JWTModule,
-    UserModule
-  ],
+  imports: [PrismaModule, JWTModule, UserModule, ModeratorModule],
   controllers: [ProductController],
-  providers: [ProductService],
+  providers: [ProductService, PrismaService],
 })
-class ProductModule {}
-export default ProductModule;
+export class ProductModule {}

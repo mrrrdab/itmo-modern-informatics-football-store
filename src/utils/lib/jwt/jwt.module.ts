@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import JWTConfig from './jwt.config';
-import JWTProvider from './jwt.provider';
-import NodeModule from '@/utils/node/node.module';
+
+import { NodeModule } from '@/utils/node';
+
+import { JWTConfig } from './jwt.config';
+import { JWTProvider } from './jwt.provider';
 
 @Module({
-  imports: [ ConfigModule, NodeModule ],
-  providers: [ JWTConfig, JWTProvider ],
-  exports: [ JWTProvider ]
+  imports: [ConfigModule, NodeModule],
+  providers: [JWTConfig, JWTProvider],
+  exports: [JWTProvider],
 })
-class JWTModule {}
-export default JWTModule;
+export class JWTModule {}

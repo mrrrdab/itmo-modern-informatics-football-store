@@ -1,55 +1,55 @@
-import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-import CustomerService from './customer.service';
-import AuthGuard from '../../../auth/guards/auth.guard';
-import RoleGuard from '@/domain/auth/guards/role.guard';
-import UseRole from '@/utils/decorators/role.decorator';
 
-@ApiTags('customers')
-@Controller('customers')
+import { AuthGuard, RoleGuard } from '@/domain/auth/guards';
+import { UseRole } from '@/utils';
+
+import { CustomerService } from './customer.service';
+import { CustomerGetDTO } from './dto';
+
+@ApiTags('Customers')
+@Controller('api/customers')
 @UseGuards(AuthGuard)
-class CustomerController {
+export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  @ApiOperation({ summary: "Получить всех покупателей" })
-  @ApiResponse({ status: 200, description: 'Список всех покупателей' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiOperation({ summary: 'Get all Customers' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: [CustomerGetDTO] })
+  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @UseGuards(RoleGuard)
   @UseRole(Role.ADMINISTRATOR)
   @Get()
-  public async getAll(@Res() res: Response): Promise<void> {
+  public async getAll(): Promise<CustomerGetDTO[]> {
     const customers = await this.customerService.getMany({});
-    res.status(200).json(customers);
+    return customers;
   }
 
-  @ApiOperation({ summary: "Получить покупателя по его id" })
-  @ApiResponse({ status: 200, description: 'Детали покупателя' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 404, description: 'Покупатель не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiOperation({ summary: 'Get Customer by Id' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: CustomerGetDTO })
+  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
+  @ApiResponse({ status: 404, description: 'Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @ApiParam({
     name: 'customerId',
     type: 'string',
     format: 'uuid',
     required: true,
-    description: "id покупателя"
+    description: 'User id',
   })
   @UseGuards(RoleGuard)
   @UseRole(Role.ADMINISTRATOR)
   @Get(':customerId')
-  public async getUniqueById(@Param('customerId') customerId: string, @Res() res: Response): Promise<void> {
+  public async getUniqueById(@Param('customerId') customerId: string): Promise<CustomerGetDTO> {
     const customer = await this.customerService.getByUniqueParams({
       where: {
-        id: customerId
-      }
+        id: customerId,
+      },
     });
 
-    res.status(200).json(customer);
+    return customer;
   }
 }
-export default CustomerController;

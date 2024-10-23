@@ -1,19 +1,22 @@
+/* eslint-disable max-len */
 import { Injectable } from '@nestjs/common';
-import IEmailBasic from './types/interface/email.basic.interface';
-import EmailSubject from './types/enum/email.subject';
-import TokenVerifDTO from './validation/dto/token.verif.dto';
-import { testUserPassword } from '../user/validation/config/user.create.config';
+
+import { testUserPassword } from '../user/dto';
+
+import { EmailSubject, IEmailBasic } from './types';
+import { TokenVerifDTO } from './dto';
 
 @Injectable()
-class AuthEmailTemplate {
+export class AuthEmailTemplate {
   private readonly emailBasicHTML: IEmailBasic = {
-    greet: '<p>Привет, это <strong>Bundestore!</strong> Мы рады привествовать вас в качестве покупателя в нашем магазине!</p><br>',
-    warn: '<p><strong>Если вы не понимаете почему получили этот email, пожалуйста, проигнорируйте его.</strong></p>'
+    greet:
+      '<p>Hello, this is <strong>Bundestore!</strong> We are pleased to welcome you as a customer in our store!</p><br>',
+    warn: '<p><strong>If you do not understand why you received this email, please ignore it.</strong></p>',
   };
 
-  private readonly emailBasicSubjects = {
-    activateAccount: "Активация аккаунта",
-    recoverPassword: "Восстановление пароля"
+  private readonly emailBasicSubjects: Record<EmailSubject, string> = {
+    activateAccount: 'Activate Account',
+    recoverPassword: 'Recover Password',
   };
 
   private emailConstructor(mainPart: string): string {
@@ -25,16 +28,17 @@ class AuthEmailTemplate {
   }
 
   public createActivationEmail(verifData: TokenVerifDTO): string {
-    return this.emailConstructor(`<p>Пожалуйста, используйте этот токен для активации аккаунта: <strong>${verifData.token}</strong></p>`);
+    return this.emailConstructor(
+      `<p>Please use this token to activate your account: <strong>${verifData.token}</strong></p>`,
+    );
   }
 
   public createRecoverEmail(password: string): string {
     testUserPassword(password);
 
     return this.emailConstructor(
-      `<p>Пожалуйста, используйте этот временный пароль для входа в систему: <strong>${password}</strong></p>
-      <p><strong>Мы настоятельно рекомендуем сразу изменить пароль, когда вы войдете в систему.</strong></p>`
+      `<p>Please use this temporary password to log in: <strong>${password}</strong></p>
+      <p><strong>We strongly recommend that you change your password immediately after you log in.</strong></p>`,
     );
   }
 }
-export default AuthEmailTemplate;
