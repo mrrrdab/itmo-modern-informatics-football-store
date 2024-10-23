@@ -46,14 +46,10 @@ class Product {
   @ApiProperty({ description: 'The number of items available in stock', example: 100 })
   @IsNumber()
   stockQuantity: number;
-
-  @ApiProperty({ description: 'The ID of the moderator responsible for managing the product', example: 1 })
-  @IsNumber()
-  moderatorId: string;
 }
 
 export class GetProductDTO extends Product {}
 
 export class CreateProductDTO extends OmitType(Product, ['id']) {}
 
-export class UpdateProductDTO extends PartialType(OmitType(Product, ['id', 'moderatorId'])) {}
+export class UpdateProductDTO extends PartialType(OmitType(Product, ['id'])) {}

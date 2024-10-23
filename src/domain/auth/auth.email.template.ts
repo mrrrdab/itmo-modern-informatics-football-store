@@ -14,7 +14,7 @@ export class AuthEmailTemplate {
     warn: '<p><strong>If you do not understand why you received this email, please ignore it.</strong></p>',
   };
 
-  private readonly emailBasicSubjects = {
+  private readonly emailBasicSubjects: Record<EmailSubject, string> = {
     activateAccount: 'Activate Account',
     recoverPassword: 'Recover Password',
   };

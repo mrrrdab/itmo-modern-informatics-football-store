@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
+import { ITXClientDenyList } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '@/database/prisma';
 
@@ -11,7 +12,7 @@ export class UserAggregate {
   constructor(private readonly prismaService: PrismaService) {}
 
   public async applySignupTransaction(userSignupData: UserSignUpDTO, verifData: TokenVerifDTO): Promise<void> {
-    await this.prismaService.$transaction(async (prisma: any) => {
+    await this.prismaService.$transaction(async (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
       const newUser = await prisma.user.create({
         data: {
           email: userSignupData.email,

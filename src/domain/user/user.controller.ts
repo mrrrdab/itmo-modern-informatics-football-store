@@ -23,7 +23,7 @@ export class UserController {
   @ApiResponse({ status: 403, description: 'Not Authorized as Administrator' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get()
-  public async getAll(@Res() res: Response): Promise<UserGetDTO[]> {
+  public async getAll(): Promise<UserGetDTO[]> {
     const users = await this.userService.getMany({});
     return users;
   }
@@ -40,7 +40,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get(':userId')
-  public async getUniqueById(@Param('userId') userId: string, @Res() res: Response): Promise<UserGetDTO> {
+  public async getUniqueById(@Param('userId') userId: string): Promise<UserGetDTO> {
     const user = await this.userService.getByUniqueParams({
       where: {
         id: userId,

@@ -13,5 +13,6 @@ import { ModeratorService } from './moderator.service';
   imports: [PrismaModule, JWTModule, AdminModule, UserModule],
   controllers: [ModeratorController],
   providers: [ModeratorService],
+  exports: [ModeratorService],
 })
 export class ModeratorModule {}

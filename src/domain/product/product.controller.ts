@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -9,23 +9,25 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 import { Role } from '@prisma/client';
 
 import { UseRole } from '@/utils';
 
 import { AuthGuard, RoleGuard } from '../auth';
+import { IUserPayload, ModeratorService } from '../user';
 
 import { CreateProductDTO, GetProductDTO, UpdateProductDTO } from './dto';
 import { ProductService } from './product.service';
 
 @ApiTags('Products')
 @Controller('api/products')
-@UseGuards(AuthGuard, RoleGuard)
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly moderatorService: ModeratorService,
+  ) {}
 
-  @UseRole(Role.CUSTOMER)
-  @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Get all Products',
   })
@@ -39,8 +41,6 @@ export class ProductController {
     return this.productService.findAll();
   }
 
-  @UseRole(Role.CUSTOMER)
-  @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Get Product by Id',
   })
@@ -55,6 +55,7 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
   @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Create product',
@@ -66,10 +67,18 @@ export class ProductController {
   @ApiBadRequestResponse({ description: 'Invalid Input' })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   @Post()
-  async create(@Body() createProductDTO: CreateProductDTO) {
-    return this.productService.create(createProductDTO);
+  async create(@Req() req: Request, @Body() createProductDTO: CreateProductDTO) {
+    const userPayload = req.user as IUserPayload;
+    const moderator = await this.moderatorService.getByUniqueParams({
+      where: {
+        userId: userPayload.id,
+      },
+    });
+
+    return this.productService.create(moderator, createProductDTO);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
   @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Update Existing Product',
@@ -86,6 +95,7 @@ export class ProductController {
     return this.productService.update(id, updateProductDTO);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
   @UseRole(Role.MODERATOR)
   @ApiOperation({
     summary: 'Delete product',

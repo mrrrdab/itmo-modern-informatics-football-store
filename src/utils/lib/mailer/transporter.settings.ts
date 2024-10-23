@@ -24,7 +24,7 @@ export class TransporterSettings {
 
   constructor(private readonly configService: ConfigService) {}
 
-  getSettings(nodeENV: NodeENV): SMTPTransport.Options {
+  public getSettings(nodeENV: NodeENV): SMTPTransport.Options {
     return {
       ...this.settings[nodeENV],
       host: this.configService.get('EMAIL_HOST'),

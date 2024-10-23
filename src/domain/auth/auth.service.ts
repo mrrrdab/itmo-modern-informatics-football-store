@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
-import { User, Role } from '@prisma/client';
+import { User, EmailVerification, Role } from '@prisma/client';
 import cron from 'node-cron';
 
 import { JWT, JWTProvider } from '@/utils';
@@ -40,7 +40,7 @@ export class AuthService {
       },
     });
 
-    nonActivatedAccounts.forEach(async (nonActivatedAccount: any) => {
+    nonActivatedAccounts.forEach(async (nonActivatedAccount: EmailVerification) => {
       if (new Date(nonActivatedAccount.expiresAt) < new Date()) {
         await this.userService.remove(nonActivatedAccount.userId);
       }

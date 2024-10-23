@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Moderator } from '@prisma/client';
 
 import { PrismaService } from '@/database/prisma';
 
@@ -13,61 +14,52 @@ export class ProductService {
   }
 
   async findOne(id: string) {
-    try {
-      const product = await this.prisma.product.findUnique({
-        where: { id },
-      });
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+    });
 
-      if (!product) {
-        throw new NotFoundException('Product with not found');
-      }
-
-      return product;
-    } catch (e) {
-      throw new BadRequestException('Invalid Parameter');
+    if (!product) {
+      throw new NotFoundException('Product not found');
     }
+
+    return product;
   }
 
-  async create(createProductDTO: CreateProductDTO) {
+  async create(moderator: Moderator, createProductDTO: CreateProductDTO) {
     return await this.prisma.product.create({
-      data: createProductDTO,
+      data: {
+        ...createProductDTO,
+        moderatorId: moderator.id,
+      },
     });
   }
 
   async update(id: string, updateProductDTO: UpdateProductDTO) {
-    try {
-      const existingProduct = await this.prisma.product.findUnique({
-        where: { id },
-      });
+    const existingProduct = await this.prisma.product.findUnique({
+      where: { id },
+    });
 
-      if (!existingProduct) {
-        throw new NotFoundException('Product with not found');
-      }
-
-      return await this.prisma.product.update({
-        where: { id },
-        data: updateProductDTO,
-      });
-    } catch (e) {
-      throw new BadRequestException('Invalid Parameter');
+    if (!existingProduct) {
+      throw new NotFoundException('Product with not found');
     }
+
+    return await this.prisma.product.update({
+      where: { id },
+      data: updateProductDTO,
+    });
   }
 
   async delete(id: string) {
-    try {
-      const product = await this.prisma.product.findUnique({
-        where: { id },
-      });
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+    });
 
-      if (!product) {
-        throw new NotFoundException(`Product with ID ${id} not found`);
-      }
-
-      return await this.prisma.product.delete({
-        where: { id },
-      });
-    } catch (e) {
-      throw new BadRequestException('Invalid Parameter');
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
     }
+
+    return await this.prisma.product.delete({
+      where: { id },
+    });
   }
 }

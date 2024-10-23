@@ -47,7 +47,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Recover Customer Password' })
   @ApiResponse({ status: 200, description: 'Successful Response' })
-  @ApiResponse({ status: 404, description: 'Not Authorized' })
+  @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @ApiParam({
     name: 'email',

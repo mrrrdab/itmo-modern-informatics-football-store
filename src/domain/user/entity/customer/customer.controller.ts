@@ -1,5 +1,4 @@
-import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
@@ -23,7 +22,7 @@ export class CustomerController {
   @UseGuards(RoleGuard)
   @UseRole(Role.ADMINISTRATOR)
   @Get()
-  public async getAll(@Res() res: Response): Promise<CustomerGetDTO[]> {
+  public async getAll(): Promise<CustomerGetDTO[]> {
     const customers = await this.customerService.getMany({});
     return customers;
   }
@@ -44,7 +43,7 @@ export class CustomerController {
   @UseGuards(RoleGuard)
   @UseRole(Role.ADMINISTRATOR)
   @Get(':customerId')
-  public async getUniqueById(@Param('customerId') customerId: string, @Res() res: Response): Promise<CustomerGetDTO> {
+  public async getUniqueById(@Param('customerId') customerId: string): Promise<CustomerGetDTO> {
     const customer = await this.customerService.getByUniqueParams({
       where: {
         id: customerId,

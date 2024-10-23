@@ -29,7 +29,7 @@ export class ModeratorController {
   @ApiResponse({ status: 403, description: 'The user is not authorized in the system as an administrator' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get()
-  public async getAll(@Res() res: Response): Promise<ModeratorGetDTO[]> {
+  public async getAll(): Promise<ModeratorGetDTO[]> {
     const moderators = await this.moderatorService.getMany({});
     return moderators;
   }
@@ -48,10 +48,7 @@ export class ModeratorController {
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get(':moderatorId')
-  public async getUniqueById(
-    @Param('moderatorId') moderatorId: string,
-    @Res() res: Response,
-  ): Promise<ModeratorGetDTO> {
+  public async getUniqueById(@Param('moderatorId') moderatorId: string): Promise<ModeratorGetDTO> {
     const moderator = await this.moderatorService.getByUniqueParams({
       where: {
         id: moderatorId,
