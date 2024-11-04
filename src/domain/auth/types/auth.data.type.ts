@@ -1,7 +1,6 @@
-import IUserPayload from '@/domain/user/types/interface/user.payload.interface';
-import JWT from '@/utils/lib/jwt/types/enum/jwt.enum';
+import { IUserPayload } from '@/domain/user';
+import { JWT } from '@/utils';
 
-type AuthData = Record<JWT, string> & {
-  userPayload: IUserPayload
+export type AuthData = Record<JWT, string> & {
+  userPayload: IUserPayload;
 };
-export default AuthData;

@@ -2,99 +2,97 @@ import { Controller, Post, Get, Param, Body, Res, UseGuards } from '@nestjs/comm
 import { Response } from 'express';
 import { Role } from '@prisma/client';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
-import ModeratorService from './moderator.service';
-import UserService from '../../user.service';
-import AdminService from '../administrator/admin.service';
-import ModeratorCreateDTO from './validation/dto/moderator.create.dto';
-import AuthGuard from '@/domain/auth/guards/auth.guard';
-import RoleGuard from '@/domain/auth/guards/role.guard';
-import UseRole from '@/utils/decorators/role.decorator';
 
-@ApiTags('moderators')
-@Controller('moderators')
+import { AuthGuard, RoleGuard } from '@/domain/auth/guards';
+import { UseRole } from '@/utils';
+
+import { UserService } from '../../user.service';
+import { AdminService } from '../administrator';
+
+import { ModeratorService } from './moderator.service';
+import { ModeratorCreateDTO, ModeratorGetDTO } from './dto';
+
+@ApiTags('Moderators')
+@Controller('api/moderators')
 @UseGuards(AuthGuard, RoleGuard)
 @UseRole(Role.ADMINISTRATOR)
-class ModeratorController {
+export class ModeratorController {
   constructor(
     private readonly moderatorService: ModeratorService,
     private readonly userService: UserService,
-    private readonly adminService: AdminService
+    private readonly adminService: AdminService,
   ) {}
 
-  @ApiOperation({ summary: "Получить всех модераторов" })
-  @ApiResponse({ status: 200, description: 'Список всех модераторов' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiOperation({ summary: 'Get all Moderators' })
+  @ApiResponse({ status: 200, description: 'Successful Response', type: [ModeratorGetDTO] })
+  @ApiResponse({ status: 401, description: 'The user is not authorized in the system' })
+  @ApiResponse({ status: 403, description: 'The user is not authorized in the system as an administrator' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get()
-  public async getAll(@Res() res: Response): Promise<void> {
+  public async getAll(): Promise<ModeratorGetDTO[]> {
     const moderators = await this.moderatorService.getMany({});
-    res.status(200).json(moderators);
+    return moderators;
   }
 
-  @ApiOperation({ summary: "Получить модератора по его id" })
+  @ApiOperation({ summary: 'Get Moderator by Id' })
   @ApiParam({
     name: 'moderatorId',
     type: 'string',
     format: 'uuid',
     required: true,
-    description: "id модератора"
+    description: 'Moderator Id',
   })
-  @ApiResponse({ status: 200, description: 'Детали модератора' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 404, description: 'Модератор не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiResponse({ status: 200, description: 'Moderator details', type: ModeratorGetDTO })
+  @ApiResponse({ status: 401, description: 'The user is not authorized in the system' })
+  @ApiResponse({ status: 403, description: 'The user is not authorized in the system as an administrator' })
+  @ApiResponse({ status: 404, description: 'Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get(':moderatorId')
-  public async getUniqueById(@Param('moderatorId') moderatorId: string, @Res() res: Response): Promise<void> {
+  public async getUniqueById(@Param('moderatorId') moderatorId: string): Promise<ModeratorGetDTO> {
     const moderator = await this.moderatorService.getByUniqueParams({
       where: {
-        id: moderatorId
-      }
+        id: moderatorId,
+      },
     });
 
-    res.status(200).json(moderator);
+    return moderator;
   }
 
-  @ApiOperation({ summary: "Зарегистрировать модератора" })
+  @ApiOperation({ summary: 'Register Moderator' })
   @ApiBody({
     type: ModeratorCreateDTO,
     examples: {
-      "User - Moderator": {
+      'User - Moderator': {
         value: {
           userId: '43062bf6-ac66-4c37-8d39-bf212f62aec3',
-          administratorId: '9a7e5c92-e0b1-4fda-a8c3-1f2d3c4e5f67'
-        }
-      }
-    }
+          administratorId: '9a7e5c92-e0b1-4fda-a8c3-1f2d3c4e5f67',
+        },
+      },
+    },
   })
-  @ApiResponse({ status: 200, description: 'Модератор успешно зарегистрирован' })
-  @ApiResponse({ status: 401, description: 'Пользователь не авторизирован в системе' })
-  @ApiResponse({ status: 403, description: 'Пользователь не авторизирован в системе как администратор' })
-  @ApiResponse({ status: 404, description: 'Пользователь или администратор не найден' })
-  @ApiResponse({ status: 500, description: 'Внутренняя ошибка сервера' })
+  @ApiResponse({ status: 200, description: 'Moderator Successfully Registered' })
+  @ApiResponse({ status: 401, description: 'The user is not authorized in the system' })
+  @ApiResponse({ status: 403, description: 'The user is not authorized in the system as an administrator' })
+  @ApiResponse({ status: 404, description: 'Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post()
-  public async create(
-    @Body() moderatorCreateData: ModeratorCreateDTO,
-    @Res() res: Response
-  ): Promise<void> {
+  public async create(@Body() moderatorCreateData: ModeratorCreateDTO, @Res() res: Response): Promise<void> {
     await this.userService.getByUniqueParams({
       where: {
-        id: moderatorCreateData.userId
-      }
+        id: moderatorCreateData.userId,
+      },
     });
 
     await this.adminService.getByUniqueParams({
       where: {
-        id: moderatorCreateData.administratorId
-      }
+        id: moderatorCreateData.administratorId,
+      },
     });
 
     const newModerator = await this.moderatorService.create(moderatorCreateData);
     res.status(200).json({
       data: newModerator,
-      message: "Модератор успешно зарегистрирован"
+      message: 'Moderator successfully registered',
     });
   }
 }
-export default ModeratorController;

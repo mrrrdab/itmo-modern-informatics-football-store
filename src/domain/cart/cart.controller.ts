@@ -1,17 +1,19 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-import { CreateCartDTO, UpdateCartDTO } from './dto';
-import CartService from './cart.service';
-import AuthGuard from '../auth/guards/auth.guard';
-import RoleGuard from '../auth/guards/role.guard';
-import UseRole from '@/utils/decorators/role.decorator';
 
-@ApiTags('carts')
-@Controller('carts')
+import { UseRole } from '@/utils';
+
+import { AuthGuard, RoleGuard } from '../auth';
+
+import { CartService } from './cart.service';
+import { CreateCartDTO, UpdateCartDTO } from './dto';
+
+@ApiTags('Carts')
+@Controller('api/carts')
 @UseGuards(AuthGuard, RoleGuard)
 @UseRole(Role.CUSTOMER)
-class CartController {
+export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get()
@@ -39,4 +41,3 @@ class CartController {
     return this.cartService.remove(+id);
   }
 }
-export default CartController;

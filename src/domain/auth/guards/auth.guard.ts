@@ -5,22 +5,22 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import JWTProvider from '@/utils/lib/jwt/jwt.provider';
-import UserService from '@/domain/user/user.service';
-import IUserPayload from '@/domain/user/types/interface/user.payload.interface';
-import JWT from '@/utils/lib/jwt/types/enum/jwt.enum';
+
+import { JWT, JWTProvider } from '@/utils';
+import { UserService } from '@/domain/user/user.service';
+import { IUserPayload } from '@/domain/user/types';
 
 @Injectable()
-class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtProvider: JWTProvider,
-    private readonly userService: UserService
-  ) { }
+    private readonly userService: UserService,
+  ) {}
 
-  private readonly unExceptionMessage: string = "Вы не авторизированы в системе";
+  private readonly unExceptionMessage: string = 'You are not authorized';
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -30,8 +30,7 @@ class AuthGuard implements CanActivate {
 
     if (!accessToken && request.cookies[JWT.refresh]) {
       accessToken = await this.refreshAccessToken(request, response);
-    }
-    else if (!accessToken && !request.cookies[JWT.refresh]) {
+    } else if (!accessToken && !request.cookies[JWT.refresh]) {
       throw new UnauthorizedException(this.unExceptionMessage);
     }
 
@@ -45,11 +44,10 @@ class AuthGuard implements CanActivate {
     try {
       await this.userService.getByUniqueParams({
         where: {
-          refreshToken: req.cookies[JWT.refresh]
-        }
+          refreshToken: req.cookies[JWT.refresh],
+        },
       });
-    }
-    catch(err) {
+    } catch (err) {
       if (err instanceof NotFoundException) {
         throw new UnauthorizedException(this.unExceptionMessage);
       }
@@ -68,7 +66,7 @@ class AuthGuard implements CanActivate {
     const refreshUserPayload: IUserPayload = {
       id: userPayload.id,
       email: userPayload.email,
-      role: userPayload.role
+      role: userPayload.role,
     };
 
     if (userPayload.firstName) {
@@ -82,4 +80,3 @@ class AuthGuard implements CanActivate {
     return refreshUserPayload;
   }
 }
-export default AuthGuard;

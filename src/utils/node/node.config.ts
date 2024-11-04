@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import NodeENV from './types/enum/node.env.enum';
+
+import { NodeENV } from './types';
 
 @Injectable()
-class NodeConfig {
+export class NodeConfig {
   private readonly nodeENV: NodeENV;
 
   constructor(private readonly configService: ConfigService) {
@@ -14,4 +15,3 @@ class NodeConfig {
     return this.nodeENV;
   }
 }
-export default NodeConfig;

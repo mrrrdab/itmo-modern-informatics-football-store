@@ -3,7 +3,7 @@ import {
   ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
-  ValidatorConstraintInterface
+  ValidatorConstraintInterface,
 } from 'class-validator';
 
 export function IsEqual(property: string, validationOptions?: ValidationOptions) {
@@ -27,6 +27,6 @@ export class IsEqualConstraint implements ValidatorConstraintInterface {
   }
 
   public defaultMessage(args: ValidationArguments): string {
-    return args.property + " must be equal to " + args.constraints[0];
+    return args.property + ' must be equal to ' + args.constraints[0];
   }
 }
