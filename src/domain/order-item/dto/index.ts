@@ -1,1 +1,2 @@
-export * from './order-item.dto';
+export * from './order-item.create.dto';
+export * from './order-item.update.dto';

@@ -4,15 +4,15 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/s
 
 import { CryptoProvider, JWT, MailerProvider } from '@/utils';
 
-import { UserService } from '../user/user.service';
-import { UserAggregate } from '../user/user.aggregate';
+import { UserService } from '../user/service/user.service';
+import { UserAggregate } from '../user/service/user.aggregate';
 import { IUserPayload } from '../user/types';
 import { EmailVerifService } from '../email-verification/email-verification.service';
 
-import { AuthEmailTemplate } from './auth.email.template';
-import { AuthService } from './auth.service';
+import { AuthEmailTemplate } from './service/auth.email.template';
+import { AuthService } from './service/auth.service';
 import { AuthGuard } from './guards';
-import { EmailSubject, PasswordChar } from './types';
+import { AuthEmailSubject, PasswordChar } from './types';
 import { TokenVerifDTO, UserSignInDTO, UserSignUpDTO } from './dto';
 
 @ApiTags('Auth')
@@ -32,17 +32,14 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  @Get('userPayload')
+  @Get('user-payload')
   @UseGuards(AuthGuard)
   public getUserPayload(@Req() req: Request, @Res() res: Response): Response | void {
     if (!req.user) {
       return res.status(401).send('Not Authorized');
     }
 
-    res.status(200).json({
-      data: req.user,
-      message: 'User Payload',
-    });
+    res.status(200).json(req.user);
   }
 
   @ApiOperation({ summary: 'Recover Customer Password' })
@@ -56,7 +53,7 @@ export class AuthController {
     required: true,
     description: 'User email',
   })
-  @Get('recoverPassword/:email')
+  @Get('recover-password/:email')
   public async recoverPassword(@Param('email') email: string, @Res() res: Response): Promise<Response | void> {
     const user = await this.userService.getByUniqueParams({
       where: {
@@ -84,7 +81,7 @@ export class AuthController {
 
     await this.mailer.getTransporter().sendMail({
       to: email,
-      subject: this.authEmailTemplate.getEmailSubject(EmailSubject.recoverPassword),
+      subject: this.authEmailTemplate.getEmailSubject(AuthEmailSubject.recoverPassword),
       html: this.authEmailTemplate.createRecoverEmail(newPassword),
     });
 
@@ -98,42 +95,36 @@ export class AuthController {
       'User - Customer || Administrator || Moderator': {
         value: {
           email: 'voyagerbvb@gmail.com',
-          password: 'hjgkdLJFOP!04',
-        },
-      },
-    },
+          password: 'hjgkdLJFOP!04'
+        }
+      }
+    }
   })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 400, description: 'Invalid Syntax' })
-  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Account is not activated' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  @Post('signin')
+  @Post('sign-in')
   public async signin(@Body() userSigninData: UserSignInDTO, @Res() res: Response): Promise<Response | void> {
     const hashUserPassword = await this.crypto.hashStringBySHA256(userSigninData.password);
     const user = await this.userService.getByUniqueParams({
       where: {
         email: userSigninData.email,
-      },
+        password: hashUserPassword
+      }
     });
-
-    if (user.password !== hashUserPassword) {
-      return res.status(401).send('Invalid email or password');
-    }
 
     if (!user.isVerified) {
       return res.status(403).send('Account is not activated');
     }
 
-    const { userPayload, refresh } = await this.authService.setJWTCookie(user, res);
+    const { refresh } = await this.authService.setJWTCookie(user, res);
     await this.userService.update(user.id, {
       refreshToken: refresh,
     });
 
-    res.status(200).json({
-      data: userPayload,
-      message: 'Successful authorization',
-    });
+    res.status(200).send("Successful authorization");
   }
 
   @ApiOperation({ summary: 'Sign Up' })
@@ -144,19 +135,18 @@ export class AuthController {
         value: {
           email: 'voyagerbvb@gmail.com',
           password: 'hjgkdLJFOP!04',
-          confirmPassword: 'hjgkdLJFOP!04',
           firstName: 'James',
           lastName: 'Smith',
           birthDate: new Date('2002-12-29'),
-          phoneNumber: '+7 (982) 408-31-75',
-        },
-      },
-    },
+          phoneNumber: '+7 (982) 408-31-75'
+        }
+      }
+    }
   })
   @ApiResponse({ status: 200, description: 'Successful Response (The account was created but not activated)' })
   @ApiResponse({ status: 400, description: 'Invalid Syntax' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  @Post('signup')
+  @Post('sign-up')
   public async signup(@Body() userSignupData: UserSignUpDTO, @Res() res: Response): Promise<Response | void> {
     userSignupData.password = await this.crypto.hashStringBySHA256(userSignupData.password);
     const verifToken = this.crypto.generateSecureVerifToken(6);
@@ -167,7 +157,7 @@ export class AuthController {
 
     await this.mailer.getTransporter().sendMail({
       to: userSignupData.email,
-      subject: this.authEmailTemplate.getEmailSubject(EmailSubject.activateAccount),
+      subject: this.authEmailTemplate.getEmailSubject(AuthEmailSubject.activateAccount),
       html: this.authEmailTemplate.createActivationEmail({
         token: verifToken,
       }),
@@ -180,7 +170,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  @Get('logout')
+  @Get('sign-out')
   @UseGuards(AuthGuard)
   public async logout(@Req() req: Request, @Res() res: Response) {
     const userPayload = req.user as IUserPayload;
@@ -206,7 +196,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  @Get('/signup/resendEmail/:email')
+  @Get('resend-email/:email')
   public async resendEmail(@Param('email') email: string, @Res() res: Response): Promise<Response | void> {
     const user = await this.userService.getByUniqueParams({
       where: {
@@ -228,10 +218,10 @@ export class AuthController {
 
     await this.mailer.getTransporter().sendMail({
       to: email,
-      subject: this.authEmailTemplate.getEmailSubject(EmailSubject.activateAccount),
+      subject: this.authEmailTemplate.getEmailSubject(AuthEmailSubject.activateAccount),
       html: this.authEmailTemplate.createActivationEmail({
         token: emailVerif.verifToken,
-      }),
+      })
     });
 
     res.status(200).send(`The letter has been successfully sent to your email address - ${email}`);
@@ -252,8 +242,11 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Verification Token Expired' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  @Post('/signup/verifyUserEmail')
-  public async verifyUserEmail(@Body() verifData: TokenVerifDTO, @Res() res: Response): Promise<Response | void> {
+  @Post('verify-email')
+  public async verifyUserEmail(
+    @Body() verifData: TokenVerifDTO,
+    @Res() res: Response
+  ): Promise<Response | void> {
     const emailVerif = await this.emailVerifService.getByUniqueParams({
       where: {
         verifToken: verifData.token,
@@ -267,21 +260,18 @@ export class AuthController {
     const user = await this.userService.getByUniqueParams({
       where: {
         id: emailVerif.userId,
-      },
+      }
     });
 
-    await this.userService.update(user.id, {
+    await this.userService.update(emailVerif.userId, {
       isVerified: true,
     });
 
-    const { userPayload, refresh } = await this.authService.setJWTCookie(user, res);
+    const { refresh } = await this.authService.setJWTCookie(user, res);
     await this.userService.update(user.id, {
       refreshToken: refresh,
     });
 
-    res.status(200).json({
-      data: userPayload,
-      message: 'Successful Authorization',
-    });
+    res.status(200).send("Successful Authorization");
   }
 }

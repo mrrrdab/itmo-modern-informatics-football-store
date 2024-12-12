@@ -3,14 +3,25 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '@/database/prisma';
 import { JWTModule } from '@/utils';
 
-import { UserModule } from '../user';
+import { UserModule, CustomerModule } from '../user';
 
+import { OrderItemModule } from '../order-item';
+
+import { CartService } from './service/cart.service';
+import { CartFilter } from './service/cart.filter';
+import { CartAggregate } from './service/cart.aggregate';
 import { CartController } from './cart.controller';
-import { CartService } from './cart.service';
 
 @Module({
-  imports: [PrismaModule, JWTModule, UserModule],
+  imports: [
+    PrismaModule,
+    JWTModule,
+    UserModule,
+    CustomerModule,
+    OrderItemModule
+  ],
   controllers: [CartController],
-  providers: [CartService],
+  providers: [CartService, CartFilter, CartAggregate],
+  exports: [CartService, CartFilter]
 })
 export class CartModule {}

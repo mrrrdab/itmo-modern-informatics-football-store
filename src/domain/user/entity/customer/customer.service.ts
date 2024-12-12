@@ -24,11 +24,27 @@ export class CustomerService {
     return customer;
   }
 
-  public async create(customerCreateData: CustomerCreateDTO): Promise<Customer> {
+  /*public async create(customerCreateData: CustomerCreateDTO): Promise<Customer> {
     const newCustomer = await this.prismaService.customer.create({
       data: customerCreateData,
     });
 
     return newCustomer;
+  }*/
+
+  public async update(
+    customer: Prisma.CustomerWhereUniqueInput,
+    customerUpdateData: Prisma.CustomerUpdateInput
+  ): Promise<Customer> {
+    const updatedCustomer = await this.prismaService.customer.update({
+      where: customer,
+      data: customerUpdateData
+    });
+
+    if (!updatedCustomer) {
+      throw new NotFoundException('Customer not found');
+    }
+
+    return updatedCustomer;
   }
 }
