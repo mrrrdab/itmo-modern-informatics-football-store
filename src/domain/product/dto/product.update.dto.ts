@@ -6,7 +6,7 @@ export class ProductUpdateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Product name',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -15,7 +15,7 @@ export class ProductUpdateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Product description',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -24,7 +24,7 @@ export class ProductUpdateDTO {
   @ApiProperty({
     type: 'number',
     description: 'Product price',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsDecimal()
@@ -33,7 +33,7 @@ export class ProductUpdateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Product image url',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -43,7 +43,7 @@ export class ProductUpdateDTO {
     type: 'enum',
     enum: Club,
     description: 'The Football Club associated with the product',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(Club)
@@ -53,7 +53,7 @@ export class ProductUpdateDTO {
     type: 'enum',
     enum: AgeCategory,
     description: 'The target age group for the product',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(AgeCategory)
@@ -63,7 +63,7 @@ export class ProductUpdateDTO {
     type: 'enum',
     enum: Gender,
     description: 'The gender category for which the product is designed',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(Gender)

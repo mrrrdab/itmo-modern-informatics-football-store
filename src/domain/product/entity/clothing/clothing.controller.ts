@@ -1,7 +1,6 @@
 import { Controller, Post, Patch, Res, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
-
 import { Role } from '@prisma/client';
 
 import { AuthGuard, RoleGuard } from '@/domain/auth';
@@ -16,7 +15,7 @@ import { ClothingService } from './clothing.service';
 @UseGuards(AuthGuard, RoleGuard)
 @UseRole(Role.MODERATOR)
 export class ClothingController {
-  constructor(private readonly clothingService: ClothingService) { }
+  constructor(private readonly clothingService: ClothingService) {}
 
   @ApiOperation({ summary: 'Create new clothing' })
   @ApiBody({
@@ -26,10 +25,10 @@ export class ClothingController {
         value: {
           size: 'SIZE_S',
           stockQuantity: 100,
-          productId: '2882d168-7f50-4a4f-8faa-a7074b407bb0'
-        }
-      }
-    }
+          productId: '2882d168-7f50-4a4f-8faa-a7074b407bb0',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Clothing Successfully Created' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -37,10 +36,7 @@ export class ClothingController {
   @ApiResponse({ status: 403, description: 'Not Authorized as Moderator' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post()
-  public async create(
-    @Body() clothingCreateData: ClothingCreateDTO,
-    @Res() res: Response
-  ): Promise<Response | void> {
+  public async create(@Body() clothingCreateData: ClothingCreateDTO, @Res() res: Response): Promise<Response | void> {
     const clothing = await this.clothingService.create(clothingCreateData);
     res.status(200).json(clothing);
   }
@@ -51,10 +47,10 @@ export class ClothingController {
     examples: {
       'Moderator - Product - Clothing': {
         value: {
-          stockQuantity: 100
-        }
-      }
-    }
+          stockQuantity: 100,
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Clothing Successfully Updated' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -66,13 +62,13 @@ export class ClothingController {
   public async updateById(
     @Param('clothingId') clothingId: string,
     @Body() clothingUpdateData: ClothingUpdateDTO,
-    @Res() res: Response
+    @Res() res: Response,
   ): Promise<Response | void> {
     const clothing = await this.clothingService.update({
       where: {
-        id: clothingId
+        id: clothingId,
       },
-      data: clothingUpdateData
+      data: clothingUpdateData,
     });
 
     res.status(200).json(clothing);

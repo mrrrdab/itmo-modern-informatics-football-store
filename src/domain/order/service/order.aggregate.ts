@@ -8,32 +8,32 @@ import { OrderCreateDTO } from '../dto';
 
 @Injectable()
 export class OrderAggregate {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async applyCreateOrderTransaction(cartId: string, orderCreateData: OrderCreateDTO): Promise<void> {
     await this.prismaService.$transaction(async (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
       const order = await prisma.order.create({
-        data: orderCreateData
+        data: orderCreateData,
       });
 
       await prisma.cart.update({
         where: {
-          id: cartId
+          id: cartId,
         },
         data: {
           total: 0,
-          quantity: 0
-        }
+          quantity: 0,
+        },
       });
 
       await prisma.orderItem.updateMany({
         where: {
-          cartId: cartId
+          cartId: cartId,
         },
         data: {
           cartId: null,
-          orderId: order.id
-        }
+          orderId: order.id,
+        },
       });
     });
   }

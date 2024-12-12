@@ -6,7 +6,7 @@ export class OrderItemUpdateDTO {
     type: 'number',
     format: 'byte',
     description: 'Product quantity',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsInt()

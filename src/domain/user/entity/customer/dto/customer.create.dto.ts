@@ -5,7 +5,7 @@ export class CustomerCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User first name',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -14,7 +14,7 @@ export class CustomerCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User last name',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -42,7 +42,7 @@ export class CustomerCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()

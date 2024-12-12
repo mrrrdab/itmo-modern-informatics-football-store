@@ -6,7 +6,7 @@ export class AccessoryUpdateDTO {
     type: 'number',
     format: 'byte',
     description: 'Stock quantity',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsInt()

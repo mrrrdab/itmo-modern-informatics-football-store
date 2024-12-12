@@ -10,7 +10,7 @@ export interface IProductFilter {
   category: ProductCategory;
   age: AgeCategory;
   gender: Gender;
-  variants: IProductVariant[]
+  variants: IProductVariant[];
 }
 
 interface IProductVariant {

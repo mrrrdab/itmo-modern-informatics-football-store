@@ -5,7 +5,7 @@ export class CustomerUpdateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User first name',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -14,7 +14,7 @@ export class CustomerUpdateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User last name',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()

@@ -7,10 +7,10 @@ import { ICartFilter } from '../types';
 
 @Injectable()
 export class CartFilter {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async querySQLFilter(customerId: string): Promise<ICartFilter> {
-    const result = await this.prismaService.$queryRaw`
+    const result = (await this.prismaService.$queryRaw`
       SELECT
         c.id,
         c.total,
@@ -41,7 +41,7 @@ export class CartFilter {
       WHERE c."customerId" = ${Prisma.raw(customerId)}
       GROUP BY
         c.id, c.total, c.quantity
-    ` as ICartFilter;
+    `) as ICartFilter;
 
     return result;
   }

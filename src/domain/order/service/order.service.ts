@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-
 import { Prisma, Order } from '@prisma/client';
+
 import { PrismaService } from '@/database/prisma';
 
 import { OrderCreateDTO } from '../dto';
@@ -16,7 +16,7 @@ export class OrderService {
 
   public async create(orderCreateData: OrderCreateDTO): Promise<Order> {
     const newOrder = await this.prismaService.order.create({
-      data: orderCreateData
+      data: orderCreateData,
     });
 
     return newOrder;

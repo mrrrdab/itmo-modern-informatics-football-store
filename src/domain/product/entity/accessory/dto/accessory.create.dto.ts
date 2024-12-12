@@ -6,7 +6,7 @@ export class AccessoryCreateDTO {
     type: 'number',
     format: 'byte',
     description: 'Stock quantity',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsInt()
@@ -17,7 +17,7 @@ export class AccessoryCreateDTO {
     type: 'string',
     format: 'uuid',
     description: 'Product id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()

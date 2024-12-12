@@ -1,17 +1,6 @@
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsEnum,
-  IsString,
-  IsEmail,
-  IsUUID,
-  Matches,
-  IsBoolean,
-  IsDate
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsEnum, IsString, IsEmail, IsUUID, Matches, IsBoolean, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-
 import { Role } from '@prisma/client';
 
 import { userCreateConfig } from '../user.create.config';
@@ -21,7 +10,7 @@ export class UserDTO {
     type: 'string',
     format: 'uuid',
     description: 'User id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -31,7 +20,7 @@ export class UserDTO {
   @ApiProperty({
     type: 'string',
     description: 'User email',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -41,7 +30,7 @@ export class UserDTO {
   @ApiProperty({
     type: 'string',
     description: 'User password',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -54,7 +43,7 @@ export class UserDTO {
     type: 'enum',
     enum: Role,
     description: 'User role',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsEnum(Role)
@@ -63,7 +52,7 @@ export class UserDTO {
   @ApiProperty({
     type: 'boolean',
     description: 'User verification status',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -72,7 +61,7 @@ export class UserDTO {
   @ApiProperty({
     type: Date,
     description: 'User created at date',
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Date)
@@ -82,7 +71,7 @@ export class UserDTO {
   @ApiProperty({
     type: Date,
     description: 'User updated at date',
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Date)

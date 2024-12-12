@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
 import { EmailTemplate } from '@/abstract/email';
-import { UserEmailSubject  } from '../types';
-
 import { TokenVerifDTO } from '@/domain/auth';
+
+import { UserEmailSubject } from '../types';
 
 @Injectable()
 export class UserEmailTemplate extends EmailTemplate {
@@ -12,7 +12,7 @@ export class UserEmailTemplate extends EmailTemplate {
   }
 
   protected override readonly emailBasicSubjects: Record<UserEmailSubject, string> = {
-    updateEmail: 'Update Email'
+    updateEmail: 'Update Email',
   };
 
   public override getEmailSubject(emailSubject: UserEmailSubject): string {

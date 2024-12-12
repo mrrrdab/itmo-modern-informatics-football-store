@@ -8,7 +8,7 @@ export class UserSignUpDTO {
   @ApiProperty({
     type: 'string',
     description: 'User email',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -18,7 +18,7 @@ export class UserSignUpDTO {
   @ApiProperty({
     type: 'string',
     description: 'User password',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -30,7 +30,7 @@ export class UserSignUpDTO {
   @ApiProperty({
     type: 'string',
     description: 'User first name',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -39,7 +39,7 @@ export class UserSignUpDTO {
   @ApiProperty({
     type: 'string',
     description: 'User last name',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()

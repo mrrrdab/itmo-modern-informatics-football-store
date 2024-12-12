@@ -8,11 +8,11 @@ export class OrderFilter {
     total: true,
     quantity: true,
     status: true,
-    createdAt: true
+    createdAt: true,
   };
 
   private readonly orderInclude: Prisma.OrderInclude = {
-    orderItems: true
+    orderItems: true,
   };
 
   public getOrderPublicFields(): Prisma.OrderSelect {

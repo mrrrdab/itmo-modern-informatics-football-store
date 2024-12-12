@@ -6,7 +6,7 @@ export class EmailVerifUpdateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Verification token',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -16,7 +16,7 @@ export class EmailVerifUpdateDTO {
     type: 'string',
     format: 'date-time',
     description: 'Verification token expiration time',
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Date)

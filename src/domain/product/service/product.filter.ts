@@ -1,26 +1,24 @@
 import { Injectable } from '@nestjs/common';
+
 import { PrismaService, PrismaNumericOperator } from '@/database/prisma';
 
-import {
-  ProductPriceDTO,
-  ProductClothingDTO,
-  ProductFootwearDTO
-} from '../dto';
+import { ProductPriceDTO, ProductClothingDTO, ProductFootwearDTO } from '../dto';
 import { IProductFilter, ProductTypedef } from '../types';
-import { ProductFilterStrategyFactory } from './strategy/product.filter.strategy';
 import { ProductWhereCondition } from '../types/product.where.conditions.type';
+
+import { ProductFilterStrategyFactory } from './strategy/product.filter.strategy';
 
 @Injectable()
 export class ProductFilter {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async querySQLFilter(filterOptions: ProductWhereCondition): Promise<IProductFilter[]> {
     const whereConditions = this.createWhereConditions(filterOptions);
     const strategy = ProductFilterStrategyFactory.createStrategy(filterOptions);
 
-    const result = await this.prismaService.$queryRaw(
-      strategy.generateSQLFilter(whereConditions)
-    ) as IProductFilter[];
+    const result = (await this.prismaService.$queryRaw(
+      strategy.generateSQLFilter(whereConditions),
+    )) as IProductFilter[];
 
     return result;
   }
@@ -36,9 +34,11 @@ export class ProductFilter {
             Object.entries(filterOptions.price as ProductPriceDTO)
               .filter(([_, value]) => value !== undefined && value !== null)
               .forEach(([key, value]) => {
-                whereConditions.push(`${ProductTypedef.p}.price ${PrismaNumericOperator[
-                  key as unknown as keyof typeof PrismaNumericOperator
-                ]} ${value}`);
+                whereConditions.push(
+                  `${ProductTypedef.p}.price ${
+                    PrismaNumericOperator[key as unknown as keyof typeof PrismaNumericOperator]
+                  } ${value}`,
+                );
               });
             break;
 

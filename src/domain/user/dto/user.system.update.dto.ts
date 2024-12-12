@@ -5,7 +5,7 @@ export class UserSystemUpdateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User refresh token',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -14,7 +14,7 @@ export class UserSystemUpdateDTO {
   @ApiProperty({
     type: Date,
     description: 'User verification status',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsBoolean()

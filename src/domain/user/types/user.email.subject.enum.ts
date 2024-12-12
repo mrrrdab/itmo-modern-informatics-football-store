@@ -1,3 +1,3 @@
 export enum UserEmailSubject {
-  updateEmail = 'updateEmail'
+  updateEmail = 'updateEmail',
 }

@@ -1,10 +1,11 @@
 import { RedisService } from '@/cache/redis';
+
 import { CryptoProvider } from '../crypto';
 
 export class CaptchaService {
   constructor(
     private readonly redisService: RedisService,
-    private readonly crypto: CryptoProvider
+    private readonly crypto: CryptoProvider,
   ) {}
 
   public async generateCaptcha(captchaLength: number = 6): Promise<string> {
@@ -12,7 +13,5 @@ export class CaptchaService {
     return token;
   }
 
-  public async verifyCaptcha(token: string) {
-
-  }
+  public async verifyCaptcha(token: string) {}
 }

@@ -34,11 +34,11 @@ export class CustomerService {
 
   public async update(
     customer: Prisma.CustomerWhereUniqueInput,
-    customerUpdateData: Prisma.CustomerUpdateInput
+    customerUpdateData: Prisma.CustomerUpdateInput,
   ): Promise<Customer> {
     const updatedCustomer = await this.prismaService.customer.update({
       where: customer,
-      data: customerUpdateData
+      data: customerUpdateData,
     });
 
     if (!updatedCustomer) {

@@ -6,9 +6,7 @@ import { REDIS_CLIENT, RedisClient } from './types';
 export class RedisService implements OnModuleDestroy {
   private readonly ttl: number = 86400;
 
-  constructor(
-    @Inject(REDIS_CLIENT) private readonly redis: RedisClient
-  ) { }
+  constructor(@Inject(REDIS_CLIENT) private readonly redis: RedisClient) {}
 
   public ping(): Promise<string> {
     return this.redis.ping();
@@ -20,7 +18,7 @@ export class RedisService implements OnModuleDestroy {
 
   public async set(key: string, value: any, ttl?: number): Promise<void> {
     await this.redis.set(key, value, {
-      EX: ttl || this.ttl
+      EX: ttl || this.ttl,
     });
   }
 

@@ -3,5 +3,5 @@ export enum PrismaNumericOperator {
   'lt' = '<',
   'gte' = '>=',
   'lte' = '<=',
-  'equals' = '='
+  'equals' = '=',
 }

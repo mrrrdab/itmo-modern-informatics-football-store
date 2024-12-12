@@ -7,6 +7,6 @@ import { redisClientFactory } from './redis-client.factory';
 @Module({
   imports: [ConfigModule],
   providers: [RedisService, redisClientFactory],
-  exports: [RedisService]
+  exports: [RedisService],
 })
-export class RedisModule { };
+export class RedisModule {}

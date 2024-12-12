@@ -1,7 +1,6 @@
 import { Controller, Post, Patch, Res, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
-
 import { Role } from '@prisma/client';
 
 import { AuthGuard, RoleGuard } from '@/domain/auth';
@@ -16,7 +15,7 @@ import { AccessoryService } from './accessory.service';
 @UseGuards(AuthGuard, RoleGuard)
 @UseRole(Role.MODERATOR)
 export class AccessoryController {
-  constructor(private readonly accessoryService: AccessoryService) { }
+  constructor(private readonly accessoryService: AccessoryService) {}
 
   @ApiOperation({ summary: 'Create new clothing' })
   @ApiBody({
@@ -25,10 +24,10 @@ export class AccessoryController {
       'Moderator - Product - Accessory': {
         value: {
           stockQuantity: 100,
-          productId: '2882d168-7f50-4a4f-8faa-a7074b407bb0'
-        }
-      }
-    }
+          productId: '2882d168-7f50-4a4f-8faa-a7074b407bb0',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Accessory Successfully Created' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -36,10 +35,7 @@ export class AccessoryController {
   @ApiResponse({ status: 403, description: 'Not Authorized as Moderator' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post()
-  public async create(
-    @Body() accessoryCreateData: AccessoryCreateDTO,
-    @Res() res: Response
-  ): Promise<Response | void> {
+  public async create(@Body() accessoryCreateData: AccessoryCreateDTO, @Res() res: Response): Promise<Response | void> {
     const accessory = await this.accessoryService.create(accessoryCreateData);
     res.status(200).json(accessory);
   }
@@ -50,10 +46,10 @@ export class AccessoryController {
     examples: {
       'Moderator - Product - Accessory': {
         value: {
-          stockQuantity: 100
-        }
-      }
-    }
+          stockQuantity: 100,
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Accessory Successfully Updated' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -65,13 +61,13 @@ export class AccessoryController {
   public async updateById(
     @Param('accessoryId') accessoryId: string,
     @Body() accessoryUpdateData: AccessoryUpdateDTO,
-    @Res() res: Response
+    @Res() res: Response,
   ): Promise<Response | void> {
     const accessory = await this.accessoryService.update({
       where: {
-        id: accessoryId
+        id: accessoryId,
       },
-      data: accessoryUpdateData
+      data: accessoryUpdateData,
     });
 
     res.status(200).json(accessory);

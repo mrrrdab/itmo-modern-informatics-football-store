@@ -10,12 +10,10 @@ import { UserCreateDTO } from '../dto';
 export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly crypto: CryptoProvider
+    private readonly crypto: CryptoProvider,
   ) {}
 
-  private readonly userUpdateFilter: Partial<keyof User>[] = [
-    'password'
-  ];
+  private readonly userUpdateFilter: Partial<keyof User>[] = ['password'];
 
   public async getMany(params: Prisma.UserFindManyArgs) {
     const users = await this.prismaService.user.findMany(params);
@@ -35,7 +33,7 @@ export class UserService {
   public async create(userCreateData: UserCreateDTO): Promise<User> {
     userCreateData.password = await this.crypto.hashStringBySHA256(userCreateData.password);
     const newUser = await this.prismaService.user.create({
-      data: userCreateData
+      data: userCreateData,
     });
 
     return newUser;

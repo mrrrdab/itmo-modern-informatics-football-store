@@ -5,7 +5,7 @@ export class CartCreateDTO {
   @ApiProperty({
     type: 'decimal',
     description: 'Total amount',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsDecimal()
@@ -14,7 +14,7 @@ export class CartCreateDTO {
   @ApiProperty({
     type: 'int',
     description: 'Quantity of products',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsInt()
@@ -24,7 +24,7 @@ export class CartCreateDTO {
     type: 'string',
     format: 'uuid',
     description: 'Customer id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsUUID()

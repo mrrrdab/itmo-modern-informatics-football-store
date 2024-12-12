@@ -3,7 +3,6 @@ import { PrismaClient, Role } from '@prisma/client';
 import { ITXClientDenyList } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '@/database/prisma';
-
 import { UserSignUpDTO, TokenVerifDTO } from '@/domain/auth';
 
 @Injectable()
@@ -39,8 +38,8 @@ export class UserAggregate {
 
       await prisma.cart.create({
         data: {
-          customerId: customer.id
-        }
+          customerId: customer.id,
+        },
       });
     });
   }

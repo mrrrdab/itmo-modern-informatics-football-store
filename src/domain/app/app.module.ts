@@ -35,7 +35,7 @@ import { AppAllExceptionsFilter } from './filters';
     ProductModule,
     ClothingModule,
     FootwearModule,
-    AccessoryModule
+    AccessoryModule,
   ],
   controllers: [AppController],
   providers: [

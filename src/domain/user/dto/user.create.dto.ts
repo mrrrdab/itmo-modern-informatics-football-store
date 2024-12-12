@@ -8,7 +8,7 @@ export class UserCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User email',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -18,7 +18,7 @@ export class UserCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User password',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -31,7 +31,7 @@ export class UserCreateDTO {
     type: 'enum',
     description: 'User role',
     enum: Role,
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsEnum(Role)

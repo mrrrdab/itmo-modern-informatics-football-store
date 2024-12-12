@@ -5,7 +5,7 @@ export class TokenVerifDTO {
   @ApiProperty({
     type: 'string',
     description: 'Verification token',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()

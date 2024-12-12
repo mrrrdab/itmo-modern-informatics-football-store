@@ -9,7 +9,7 @@ export class PurchaseDTO {
   @ApiProperty({
     type: OrderCreateDTO,
     description: 'Order params',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @ValidateNested()
@@ -20,7 +20,7 @@ export class PurchaseDTO {
     type: [OrderItemCreateDTO],
     description: 'Products',
     isArray: true,
-    required: false
+    required: false,
   })
   @IsArray()
   @ArrayNotEmpty()

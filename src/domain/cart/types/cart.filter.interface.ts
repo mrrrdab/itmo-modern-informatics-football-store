@@ -5,6 +5,6 @@ export interface ICartFilter {
   total: number;
   quantity: number;
   orderItems: (OrderItem & {
-    stockQuantity: number
+    stockQuantity: number;
   })[];
 }

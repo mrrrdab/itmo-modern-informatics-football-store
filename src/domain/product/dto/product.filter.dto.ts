@@ -1,9 +1,8 @@
 import { IsOptional, IsEnum, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ProductCategory, AgeCategory, Gender, Club } from '@prisma/client';
 
 import { MutuallyExclusive } from '@/utils';
-
-import { ProductCategory, AgeCategory, Gender, Club } from '@prisma/client';
 
 import { ProductPriceDTO } from './product.price.dto';
 import { ProductClothingDTO } from './product.clothing.dto';

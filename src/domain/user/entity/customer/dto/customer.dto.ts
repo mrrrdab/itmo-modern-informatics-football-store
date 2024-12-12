@@ -7,7 +7,7 @@ export class CustomerDTO {
     type: 'string',
     format: 'uuid',
     description: 'Customer id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsUUID()
@@ -16,7 +16,7 @@ export class CustomerDTO {
   @ApiProperty({
     type: 'string',
     description: 'User first name',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -25,7 +25,7 @@ export class CustomerDTO {
   @ApiProperty({
     type: 'string',
     description: 'User last name',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -35,7 +35,7 @@ export class CustomerDTO {
     type: 'string',
     format: 'date',
     description: 'User birth date',
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Date)
@@ -45,7 +45,7 @@ export class CustomerDTO {
   @ApiProperty({
     type: 'string',
     description: 'User phone number',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsPhoneNumber()
@@ -55,7 +55,7 @@ export class CustomerDTO {
     type: 'string',
     format: 'uuid',
     description: 'User id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsUUID()

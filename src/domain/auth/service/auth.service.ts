@@ -4,12 +4,11 @@ import { User, EmailVerification, Role } from '@prisma/client';
 import cron from 'node-cron';
 
 import { JWT, JWTProvider } from '@/utils';
+import { CustomerService } from '@/domain/user/entity/customer/customer.service';
 
 import { UserService } from '../../user/service/user.service';
 import { IUserPayload } from '../../user';
-import { CustomerService } from '@/domain/user/entity/customer/customer.service';
 import { EmailVerifService } from '../../email-verification/email-verification.service';
-
 import { AuthData, PasswordChar } from '../types';
 
 @Injectable()
@@ -51,14 +50,14 @@ export class AuthService {
     const userPayload: IUserPayload = {
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     };
 
     if (userPayload.role === Role.CUSTOMER) {
       const customer = await this.customerService.getByUniqueParams({
         where: {
           userId: user.id,
-        }
+        },
       });
 
       userPayload.firstName = customer.firstName;

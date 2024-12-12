@@ -1,17 +1,17 @@
 import { Controller, Param, Body, Req, Res, Get, Post, Patch, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-
 import { Request, Response } from 'express';
 
 import { AuthGuard, RoleGuard } from '@/domain/auth/guards';
 import { AuthService } from '@/domain/auth/service/auth.service';
 import { UseRole } from '@/utils';
 
-import { CustomerService } from './customer.service';
-import { CustomerDTO, CustomerUpdateDTO } from './dto';
 import { IUserPayload } from '../../types';
 import { UserService } from '../../service/user.service';
+
+import { CustomerService } from './customer.service';
+import { CustomerDTO, CustomerUpdateDTO } from './dto';
 
 @ApiTags('Customers')
 @Controller('api/customers')
@@ -20,8 +20,8 @@ export class CustomerController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
-    private readonly customerService: CustomerService
-  ) { }
+    private readonly customerService: CustomerService,
+  ) {}
 
   @ApiOperation({ summary: 'Get all Customers' })
   @ApiResponse({ status: 200, description: 'Successful Response', type: [CustomerDTO] })
@@ -76,10 +76,10 @@ export class CustomerController {
         value: {
           firstName: 'Богдан',
           lastName: 'Егоров',
-          phoneNumber: '+ 7(982) 408 31-75'
-        }
-      }
-    }
+          phoneNumber: '+ 7(982) 408 31-75',
+        },
+      },
+    },
   })
   @UseGuards(RoleGuard)
   @UseRole(Role.CUSTOMER)
@@ -87,24 +87,27 @@ export class CustomerController {
   public async update(
     @Req() req: Request,
     @Body() customerUpdateData: CustomerUpdateDTO,
-    @Res() res: Response
+    @Res() res: Response,
   ): Promise<Response | void> {
     const userPayload = req.user as IUserPayload;
-    await this.customerService.update({
-      userId: userPayload.id
-    }, customerUpdateData);
+    await this.customerService.update(
+      {
+        userId: userPayload.id,
+      },
+      customerUpdateData,
+    );
 
     const user = await this.userService.getByUniqueParams({
       where: {
-        id: userPayload.id
-      }
+        id: userPayload.id,
+      },
     });
 
     const { refresh } = await this.authService.setJWTCookie(user, res);
     await this.userService.update(user.id, {
-      refreshToken: refresh
+      refreshToken: refresh,
     });
 
-    res.status(200).send("Customer updated successfully");
+    res.status(200).send('Customer updated successfully');
   }
 }

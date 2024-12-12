@@ -1,13 +1,12 @@
 import { IsNotEmpty, IsString, IsNumber, IsEnum, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
 import { ProductCategory, AgeCategory, Gender, Club } from '@prisma/client';
 
 export class ProductCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Product name',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -16,7 +15,7 @@ export class ProductCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Product description',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -25,7 +24,7 @@ export class ProductCreateDTO {
   @ApiProperty({
     type: 'number',
     description: 'Product price',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsNumber()
@@ -34,7 +33,7 @@ export class ProductCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Product image url',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -45,7 +44,7 @@ export class ProductCreateDTO {
     description: 'Product category',
     enum: ProductCategory,
     example: ProductCategory.UPPER_CLOTHING,
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsEnum(ProductCategory)
@@ -56,7 +55,7 @@ export class ProductCreateDTO {
     description: 'The Football Club associated with the product',
     enum: Club,
     example: Club.BAYERN_MUNICH,
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsEnum(Club)
@@ -67,7 +66,7 @@ export class ProductCreateDTO {
     description: 'The target age group for the product',
     enum: AgeCategory,
     example: AgeCategory.ADULT,
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsEnum(AgeCategory)
@@ -78,7 +77,7 @@ export class ProductCreateDTO {
     description: 'The gender category for which the product is designed',
     enum: Gender,
     example: Gender.UNISEX,
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsEnum(Gender)

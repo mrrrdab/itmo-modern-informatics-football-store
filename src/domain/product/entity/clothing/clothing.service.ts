@@ -1,14 +1,15 @@
 import { Prisma, Clothing } from '@prisma/client';
+
 import { PrismaService } from '@/database/prisma';
 
 import { ClothingCreateDTO } from './dto/clothing.create.dto';
 
 export class ClothingService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async create(clothingCreateData: ClothingCreateDTO): Promise<Clothing> {
     const newClothing = await this.prismaService.clothing.create({
-      data: clothingCreateData
+      data: clothingCreateData,
     });
 
     return newClothing;

@@ -7,16 +7,14 @@ import { UseRole } from '@/utils';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
-
 import { IUserPayload } from '../user';
 import { CustomerService } from '../user/entity/customer/customer.service';
+import { CartRelations } from '../cart/types';
+import { CartService } from '../cart';
 
 import { OrderService } from './service/order.service';
 import { OrderFilter } from './service/order.filter';
 import { OrderAggregate } from './service/order.aggregate';
-
-import { CartRelations } from '../cart/types';
-import { CartService } from '../cart';
 
 @ApiTags('Orders')
 @Controller('api/orders')
@@ -31,7 +29,7 @@ export class OrderController {
     private readonly cartService: CartService,
   ) {}
 
-  @ApiOperation({ summary: "Get user orders" })
+  @ApiOperation({ summary: 'Get user orders' })
   @ApiResponse({ status: 200, description: 'User orders' })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Customer' })
@@ -42,28 +40,28 @@ export class OrderController {
     const user = req.user as IUserPayload;
     const customer = await this.customerService.getByUniqueParams({
       where: {
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
     const orders = await this.orderService.getAll({
       where: {
-        customerId: customer.id
+        customerId: customer.id,
       },
       select: {
         ...this.orderFilter.getOrderPublicFields(),
-        ...this.orderFilter.getOrderInclude()
-      }
+        ...this.orderFilter.getOrderInclude(),
+      },
     });
 
     if (orders.length === 0) {
-      return res.status(404).send("Orders were not found");
+      return res.status(404).send('Orders were not found');
     }
 
     res.status(200).json(orders);
   }
 
-  @ApiOperation({ summary: "Create new user order" })
+  @ApiOperation({ summary: 'Create new user order' })
   @ApiResponse({ status: 200, description: 'Order Successfully Created' })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Customer' })
@@ -74,27 +72,27 @@ export class OrderController {
     const user = req.user as IUserPayload;
     const customer = await this.customerService.getByUniqueParams({
       where: {
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
-    const cart = await this.cartService.getByUniqueParams({
+    const cart = (await this.cartService.getByUniqueParams({
       where: {
-        customerId: customer.id
+        customerId: customer.id,
       },
-      include: this.orderFilter.getOrderInclude()
-    }) as CartRelations;
+      include: this.orderFilter.getOrderInclude(),
+    })) as CartRelations;
 
     if (!cart.orderItems || (cart.orderItems && cart.orderItems.length === 0)) {
-      return res.status(404).send("Cart is empty");
+      return res.status(404).send('Cart is empty');
     }
 
     await this.orderAggregate.applyCreateOrderTransaction(cart.id, {
       total: Number(cart.total),
       quantity: cart.quantity,
-      customerId: customer.id
+      customerId: customer.id,
     });
 
-    res.status(200).send("New order successfully created");
+    res.status(200).send('New order successfully created');
   }
 }

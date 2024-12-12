@@ -7,7 +7,7 @@ export class UserSignInDTO {
   @ApiProperty({
     type: 'string',
     description: 'User email',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -17,7 +17,7 @@ export class UserSignInDTO {
   @ApiProperty({
     type: 'string',
     description: 'User password',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()

@@ -95,10 +95,10 @@ export class AuthController {
       'User - Customer || Administrator || Moderator': {
         value: {
           email: 'voyagerbvb@gmail.com',
-          password: 'hjgkdLJFOP!04'
-        }
-      }
-    }
+          password: 'hjgkdLJFOP!04',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 400, description: 'Invalid Syntax' })
@@ -111,8 +111,8 @@ export class AuthController {
     const user = await this.userService.getByUniqueParams({
       where: {
         email: userSigninData.email,
-        password: hashUserPassword
-      }
+        password: hashUserPassword,
+      },
     });
 
     if (!user.isVerified) {
@@ -124,7 +124,7 @@ export class AuthController {
       refreshToken: refresh,
     });
 
-    res.status(200).send("Successful authorization");
+    res.status(200).send('Successful authorization');
   }
 
   @ApiOperation({ summary: 'Sign Up' })
@@ -138,10 +138,10 @@ export class AuthController {
           firstName: 'James',
           lastName: 'Smith',
           birthDate: new Date('2002-12-29'),
-          phoneNumber: '+7 (982) 408-31-75'
-        }
-      }
-    }
+          phoneNumber: '+7 (982) 408-31-75',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Successful Response (The account was created but not activated)' })
   @ApiResponse({ status: 400, description: 'Invalid Syntax' })
@@ -221,7 +221,7 @@ export class AuthController {
       subject: this.authEmailTemplate.getEmailSubject(AuthEmailSubject.activateAccount),
       html: this.authEmailTemplate.createActivationEmail({
         token: emailVerif.verifToken,
-      })
+      }),
     });
 
     res.status(200).send(`The letter has been successfully sent to your email address - ${email}`);
@@ -243,10 +243,7 @@ export class AuthController {
   @ApiResponse({ status: 404, description: 'Not Found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post('verify-email')
-  public async verifyUserEmail(
-    @Body() verifData: TokenVerifDTO,
-    @Res() res: Response
-  ): Promise<Response | void> {
+  public async verifyUserEmail(@Body() verifData: TokenVerifDTO, @Res() res: Response): Promise<Response | void> {
     const emailVerif = await this.emailVerifService.getByUniqueParams({
       where: {
         verifToken: verifData.token,
@@ -260,7 +257,7 @@ export class AuthController {
     const user = await this.userService.getByUniqueParams({
       where: {
         id: emailVerif.userId,
-      }
+      },
     });
 
     await this.userService.update(emailVerif.userId, {
@@ -272,6 +269,6 @@ export class AuthController {
       refreshToken: refresh,
     });
 
-    res.status(200).send("Successful Authorization");
+    res.status(200).send('Successful Authorization');
   }
 }

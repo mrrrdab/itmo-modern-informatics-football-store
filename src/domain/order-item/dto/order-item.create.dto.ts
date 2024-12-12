@@ -1,6 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString, IsUUID, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
 import { ClothingSize, FootwearSize } from '@prisma/client';
 
 type Size = ClothingSize | FootwearSize;
@@ -10,7 +9,7 @@ export class OrderItemCreateDTO {
     type: 'string',
     format: 'uuid',
     description: 'Product id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -20,12 +19,12 @@ export class OrderItemCreateDTO {
   @ApiProperty({
     enum: [ClothingSize, FootwearSize],
     description: 'Product size',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum({
     ...ClothingSize,
-    ...FootwearSize
+    ...FootwearSize,
   })
   public size?: ClothingSize | FootwearSize;
 }

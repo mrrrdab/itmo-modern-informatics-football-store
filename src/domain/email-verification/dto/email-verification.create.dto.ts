@@ -5,7 +5,7 @@ export class EmailVerifCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'Verification token',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -15,7 +15,7 @@ export class EmailVerifCreateDTO {
     type: 'string',
     format: 'uuid',
     description: 'User id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()

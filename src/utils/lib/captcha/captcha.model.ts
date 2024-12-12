@@ -1,3 +1,1 @@
-export class CaptchaModel {
-
-}
+export class CaptchaModel {}

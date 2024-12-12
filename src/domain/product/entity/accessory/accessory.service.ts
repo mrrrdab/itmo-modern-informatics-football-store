@@ -1,14 +1,15 @@
 import { Prisma, Accessory } from '@prisma/client';
+
 import { PrismaService } from '@/database/prisma';
 
 import { AccessoryCreateDTO } from './dto/accessory.create.dto';
 
 export class AccessoryService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async create(accessoryCreateData: AccessoryCreateDTO): Promise<Accessory> {
     const newAccessory = await this.prismaService.accessory.create({
-      data: accessoryCreateData
+      data: accessoryCreateData,
     });
 
     return newAccessory;

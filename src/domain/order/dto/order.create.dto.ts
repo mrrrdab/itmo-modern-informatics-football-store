@@ -5,7 +5,7 @@ export class OrderCreateDTO {
   @ApiProperty({
     type: 'decimal',
     description: 'Total order amount',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsDecimal()
@@ -14,7 +14,7 @@ export class OrderCreateDTO {
   @ApiProperty({
     type: 'int',
     description: 'Product quantity',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsInt()
@@ -25,7 +25,7 @@ export class OrderCreateDTO {
     type: 'string',
     format: 'uuid',
     description: 'Customer id',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsString()

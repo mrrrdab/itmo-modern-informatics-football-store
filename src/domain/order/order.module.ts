@@ -5,7 +5,6 @@ import { JWTModule } from '@/utils';
 
 import { UserModule } from '../user/user.module';
 import { CustomerModule } from '../user/entity/customer/customer.module';
-
 import { CartModule } from '../cart/cart.module';
 
 import { OrderService } from './service/order.service';
@@ -14,15 +13,9 @@ import { OrderAggregate } from './service/order.aggregate';
 import { OrderController } from './order.controller';
 
 @Module({
-  imports: [
-    PrismaModule,
-    JWTModule,
-    UserModule,
-    CustomerModule,
-    CartModule
-  ],
+  imports: [PrismaModule, JWTModule, UserModule, CustomerModule, CartModule],
   controllers: [OrderController],
   providers: [OrderService, OrderFilter, OrderAggregate],
-  exports: [OrderService]
+  exports: [OrderService],
 })
 export class OrderModule {}

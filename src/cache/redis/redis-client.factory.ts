@@ -10,10 +10,10 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
   useFactory: async (configService: ConfigService) => {
     const client = createClient({
       url: `redis://${configService.get<string>('REDIS_HOST')}:${configService.get<string>('REDIS_PORT')}`,
-      password: configService.get<string>('REDIS_PASSWORD')
+      password: configService.get<string>('REDIS_PASSWORD'),
     });
 
     await client.connect();
     return client;
-  }
+  },
 };

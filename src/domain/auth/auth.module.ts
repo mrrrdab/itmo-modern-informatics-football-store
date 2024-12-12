@@ -11,17 +11,9 @@ import { AuthService } from './service/auth.service';
 import { AuthController } from './auth.controller';
 
 @Module({
-  imports: [
-    PrismaModule,
-    CryptoModule,
-    MailerModule,
-    JWTModule,
-    UserModule,
-    CustomerModule,
-    EmailVerifModule
-  ],
+  imports: [PrismaModule, CryptoModule, MailerModule, JWTModule, UserModule, CustomerModule, EmailVerifModule],
   controllers: [AuthController],
   providers: [AuthService, AuthEmailTemplate],
-  exports: [AuthService]
+  exports: [AuthService],
 })
 export class AuthModule {}

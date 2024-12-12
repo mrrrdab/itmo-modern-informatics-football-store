@@ -1,22 +1,19 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-
 import { Role, ClothingSize } from '@prisma/client';
 
 import { UseRole } from '@/utils';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
-
 import { IUserPayload } from '../user';
 import { CustomerService } from '../user/entity/customer/customer.service';
+import { OrderItemService, OrderItemCreateDTO, OrderItemUpdateDTO } from '../order-item';
 
 import { CartService } from './service/cart.service';
 import { CartFilter } from './service/cart.filter';
 import { CartAggregate } from './service/cart.aggregate';
-
-import { OrderItemService, OrderItemCreateDTO, OrderItemUpdateDTO } from '../order-item';
 
 @ApiTags('Carts')
 @Controller('api/carts')
@@ -28,8 +25,8 @@ export class CartController {
     private readonly cartFilter: CartFilter,
     private readonly cartAggregate: CartAggregate,
     private readonly customerService: CustomerService,
-    private readonly orderItemService: OrderItemService
-  ) { }
+    private readonly orderItemService: OrderItemService,
+  ) {}
 
   @ApiOperation({ summary: 'Get current user cart' })
   @ApiResponse({ status: 200, description: 'User cart' })
@@ -41,8 +38,8 @@ export class CartController {
     const user = req.user as IUserPayload;
     const customer = await this.customerService.getByUniqueParams({
       where: {
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
     const cart = await this.cartFilter.querySQLFilter(customer.id);
@@ -56,10 +53,10 @@ export class CartController {
       'Moderator - Cart - OrderItem': {
         value: {
           productId: '8e6b1e5a-333f-480f-8012-29b3f39ae340',
-          size: ClothingSize.SIZE_L
-        }
-      }
-    }
+          size: ClothingSize.SIZE_L,
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Item Successfully Added' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -71,23 +68,23 @@ export class CartController {
   public async addItem(
     @Req() req: Request,
     @Body() orderItemCreateData: OrderItemCreateDTO,
-    @Res() res: Response
+    @Res() res: Response,
   ): Promise<Response | void> {
     const user = req.user as IUserPayload;
     const customer = await this.customerService.getByUniqueParams({
       where: {
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
     const cart = await this.cartService.getByUniqueParams({
       where: {
-        customerId: customer.id
-      }
+        customerId: customer.id,
+      },
     });
 
     await this.cartAggregate.applyAddItemToCartTransaction(cart, orderItemCreateData);
-    res.status(200).send("Item successfully added to cart");
+    res.status(200).send('Item successfully added to cart');
   }
 
   @ApiOperation({ summary: 'Update cart product' })
@@ -96,17 +93,17 @@ export class CartController {
     type: 'string',
     format: 'uuid',
     description: 'Order item id',
-    required: true
+    required: true,
   })
   @ApiBody({
     type: OrderItemUpdateDTO,
     examples: {
       'Moderator - Cart - OrderItem': {
         value: {
-          quantity: 3
-        }
-      }
-    }
+          quantity: 3,
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Item Successfully Updated' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -119,30 +116,30 @@ export class CartController {
     @Req() req: Request,
     @Param('orderItemId') orderItemId: string,
     @Body() orderItemUpdateData: OrderItemUpdateDTO,
-    @Res() res: Response
+    @Res() res: Response,
   ): Promise<Response | void> {
     const user = req.user as IUserPayload;
     const customer = await this.customerService.getByUniqueParams({
       where: {
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
     const cart = await this.cartService.getByUniqueParams({
       where: {
-        customerId: customer.id
-      }
+        customerId: customer.id,
+      },
     });
 
     const orderItem = await this.orderItemService.getByUniqueParams({
       where: {
         id: orderItemId,
-        cartId: cart.id
-      }
+        cartId: cart.id,
+      },
     });
 
     await this.cartAggregate.applyUpdateItemInCartTransaction(cart, orderItem, orderItemUpdateData);
-    res.status(200).send("Item successfully updated");
+    res.status(200).send('Item successfully updated');
   }
 
   @ApiOperation({ summary: 'Remove product from cart' })
@@ -151,7 +148,7 @@ export class CartController {
     type: 'string',
     format: 'uuid',
     description: 'Order item id',
-    required: true
+    required: true,
   })
   @ApiResponse({ status: 200, description: 'Item Successfully Removed' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -163,29 +160,29 @@ export class CartController {
   public async removeItem(
     @Req() req: Request,
     @Param('orderItemId') orderItemId: string,
-    @Res() res: Response
+    @Res() res: Response,
   ): Promise<Response | void> {
     const user = req.user as IUserPayload;
     const customer = await this.customerService.getByUniqueParams({
       where: {
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
     const cart = await this.cartService.getByUniqueParams({
       where: {
-        customerId: customer.id
-      }
+        customerId: customer.id,
+      },
     });
 
     const orderItem = await this.orderItemService.getByUniqueParams({
       where: {
         id: orderItemId,
-        cartId: cart.id
-      }
+        cartId: cart.id,
+      },
     });
 
     await this.cartAggregate.applyRemoveItemFromCartTransaction(orderItem, cart);
-    res.status(200).json("Item successfully deleted");
+    res.status(200).json('Item successfully deleted');
   }
 }

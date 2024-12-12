@@ -1,5 +1,4 @@
 import { IsOptional, IsEnum } from 'class-validator';
-
 import { FootwearSize } from '@prisma/client';
 
 export class ProductFootwearDTO {

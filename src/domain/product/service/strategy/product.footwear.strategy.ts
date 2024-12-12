@@ -1,9 +1,10 @@
 import { Prisma } from '@prisma/client';
+
 import { IProductFilterStrategy } from '../../types';
 
 export class ProductFootwearStrategy implements IProductFilterStrategy {
   public generateSQLFilter(whereConditions?: string): Prisma.Sql {
-    whereConditions = whereConditions ? ('WHERE ' + whereConditions) : '';
+    whereConditions = whereConditions ? 'WHERE ' + whereConditions : '';
     return Prisma.sql`
       SELECT
         p.id,

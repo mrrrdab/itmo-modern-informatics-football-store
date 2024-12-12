@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
 import { Prisma, OrderItem } from '@prisma/client';
+
 import { PrismaService } from '@/database/prisma';
 
 import { OrderItemCreateDTO } from './dto';
@@ -23,8 +23,8 @@ export class OrderItemService {
     const newOrderItem = await this.prismaService.orderItem.create({
       data: {
         ...orderItemCreateData,
-        cartId: cartId
-      }
+        cartId: cartId,
+      },
     });
 
     return newOrderItem;
