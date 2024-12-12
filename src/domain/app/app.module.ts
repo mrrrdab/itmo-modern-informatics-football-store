@@ -10,6 +10,9 @@ import { CartModule } from '../cart';
 import { OrderItemModule } from '../order-item';
 import { OrderModule } from '../order';
 import { ProductModule } from '../product';
+import { ClothingModule } from '../product/entity/clothing/clothing.module';
+import { FootwearModule } from '../product/entity/footwear/footwear.module';
+import { AccessoryModule } from '../product/entity/accessory/accessory.module';
 
 import appConfig from './app.config';
 import { AppController } from './app.controller';
@@ -30,6 +33,9 @@ import { AppAllExceptionsFilter } from './filters';
     OrderItemModule,
     OrderModule,
     ProductModule,
+    ClothingModule,
+    FootwearModule,
+    AccessoryModule
   ],
   controllers: [AppController],
   providers: [

@@ -1,14 +1,14 @@
-import { IsNotEmpty, IsOptional, IsDate, IsString, IsEmail, IsPhoneNumber, Matches } from 'class-validator';
+import { IsNotEmpty, IsDate, IsString, IsEmail, IsPhoneNumber, Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsEqual } from '@/utils';
-import { userCreateConfig } from '@/domain/user/dto';
+import { userCreateConfig } from '@/domain/user';
 
 export class UserSignUpDTO {
   @ApiProperty({
     type: 'string',
     description: 'User email',
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -18,6 +18,7 @@ export class UserSignUpDTO {
   @ApiProperty({
     type: 'string',
     description: 'User password',
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -28,16 +29,8 @@ export class UserSignUpDTO {
 
   @ApiProperty({
     type: 'string',
-    description: 'User password confirmation',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @IsEqual('password')
-  public confirmPassword: string;
-
-  @ApiProperty({
-    type: 'string',
     description: 'User first name',
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -46,6 +39,7 @@ export class UserSignUpDTO {
   @ApiProperty({
     type: 'string',
     description: 'User last name',
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -57,17 +51,17 @@ export class UserSignUpDTO {
     description: 'User birth date',
     required: false,
   })
-  @IsOptional()
+  @IsNotEmpty()
   @Type(() => Date)
   @IsDate()
-  public birthDate?: string;
+  public birthDate: Date;
 
   @ApiProperty({
     type: 'string',
     description: 'User phone number',
     required: false,
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsPhoneNumber()
-  public phoneNumber?: string;
+  public phoneNumber: string;
 }

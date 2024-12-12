@@ -6,7 +6,7 @@ import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/s
 import { AuthGuard, RoleGuard } from '@/domain/auth/guards';
 import { UseRole } from '@/utils';
 
-import { UserService } from '../../user.service';
+import { UserService } from '../../service/user.service';
 import { AdminService } from '../administrator';
 
 import { ModeratorService } from './moderator.service';

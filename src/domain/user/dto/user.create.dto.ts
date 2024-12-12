@@ -2,12 +2,13 @@ import { IsNotEmpty, IsOptional, IsEnum, IsString, IsEmail, Matches, IsBoolean }
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
-import { userCreateConfig } from './user.create.config';
+import { userCreateConfig } from '../user.create.config';
 
 export class UserCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User email',
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -17,6 +18,7 @@ export class UserCreateDTO {
   @ApiProperty({
     type: 'string',
     description: 'User password',
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -26,8 +28,10 @@ export class UserCreateDTO {
   public password: string;
 
   @ApiProperty({
-    type: 'Role',
+    type: 'enum',
     description: 'User role',
+    enum: Role,
+    required: true
   })
   @IsNotEmpty()
   @IsEnum(Role)

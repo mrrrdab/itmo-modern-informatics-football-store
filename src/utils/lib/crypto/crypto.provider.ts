@@ -13,7 +13,7 @@ export class CryptoProvider {
     });
   }
 
-  public generateSecureVerifToken(length: number = 20): string {
+  public generateSecureVerifToken(length: number = 10): string {
     return randomBytes(length).toString('hex');
   }
 }

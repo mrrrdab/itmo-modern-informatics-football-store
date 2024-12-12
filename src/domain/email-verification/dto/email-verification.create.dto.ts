@@ -4,7 +4,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class EmailVerifCreateDTO {
   @ApiProperty({
     type: 'string',
-    description: 'User verification token',
+    description: 'Verification token',
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -12,7 +13,9 @@ export class EmailVerifCreateDTO {
 
   @ApiProperty({
     type: 'string',
+    format: 'uuid',
     description: 'User id',
+    required: true
   })
   @IsNotEmpty()
   @IsString()

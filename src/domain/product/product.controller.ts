@@ -1,113 +1,145 @@
-import { Controller, Get, Post, Req, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiInternalServerErrorResponse,
-  ApiNoContentResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
-import { Request } from 'express';
-import { Role } from '@prisma/client';
+import { Controller, Req, Res, Get, Post, Patch, Query, Param, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { Request, Response } from 'express';
+
+import { Role, ProductCategory, Club, AgeCategory, Gender } from '@prisma/client';
 
 import { UseRole } from '@/utils';
 
 import { AuthGuard, RoleGuard } from '../auth';
 import { IUserPayload, ModeratorService } from '../user';
 
-import { CreateProductDTO, GetProductDTO, UpdateProductDTO } from './dto';
-import { ProductService } from './product.service';
+import { ProductCreateDTO, ProductUpdateDTO, ProductFilterDTO, ProductAdditionalWhereDTO } from './dto';
+import { ProductService } from './service/product.service';
+import { ProductFilter } from './service/product.filter';
 
 @ApiTags('Products')
 @Controller('api/products')
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
-    private readonly moderatorService: ModeratorService,
-  ) {}
+    private readonly productFilter: ProductFilter,
+    private readonly moderatorService: ModeratorService
+  ) { }
 
-  @ApiOperation({
-    summary: 'Get all Products',
-  })
-  @ApiOkResponse({
-    description: 'Successful Response',
-    type: [GetProductDTO],
-  })
-  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+  @ApiOperation({ summary: 'Find All Products by Filter' })
+  @ApiResponse({ status: 200, description: 'Products List' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 404, description: 'Products Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get()
-  async findAll() {
-    return this.productService.findAll();
+  public async getAll(@Query() queryParams: ProductFilterDTO, @Res() res: Response): Promise<Response | void> {
+    const products = await this.productFilter.querySQLFilter(queryParams);
+    if (products.length === 0) {
+      return res.status(404).send("Products were not found");
+    }
+
+    res.status(200).json(products);
   }
 
-  @ApiOperation({
-    summary: 'Get Product by Id',
-  })
-  @ApiOkResponse({
-    description: 'Successful Response',
-    type: GetProductDTO,
-  })
-  @ApiNotFoundResponse({ description: 'Not Found' })
-  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+  @ApiOperation({ summary: 'Get Product by Id' })
+  @ApiResponse({ status: 200, description: 'Product Details' })
+  @ApiResponse({ status: 404, description: 'Product Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.productService.findOne(id);
+  public async getById(@Param('id') productId: string, @Res() res: Response): Promise<Response | void> {
+    const product = await this.productFilter.querySQLFilter({
+      id: productId
+    });
+
+    if (!product[0]) {
+      return res.status(404).send("Product were not found");
+    }
+
+    res.status(200).json(product[0]);
   }
 
+  @ApiOperation({ summary: 'Create new clothing' })
+  @ApiBody({
+    type: ProductCreateDTO,
+    examples: {
+      'Moderator - Product': {
+        value: {
+          name: "FC Bayern Main T-shirt",
+          description: "T-shirt for adults (women)",
+          price: 3200,
+          imageUrl: "./src/public/img/bayern/clothing/upper",
+          category: ProductCategory.LOWER_CLOTHING,
+          club: Club.BAYERN_MUNICH,
+          age: AgeCategory.ADULT,
+          gender: Gender.WOMEN
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 200, description: 'Product Successfully Created' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Not Authorized as Moderator' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @UseGuards(AuthGuard, RoleGuard)
   @UseRole(Role.MODERATOR)
-  @ApiOperation({
-    summary: 'Create product',
-  })
-  @ApiCreatedResponse({
-    description: 'Successful Response',
-    type: GetProductDTO,
-  })
-  @ApiBadRequestResponse({ description: 'Invalid Input' })
-  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
-  @Post()
-  async create(@Req() req: Request, @Body() createProductDTO: CreateProductDTO) {
+  @Post('create')
+  public async create(
+    @Req() req: Request,
+    @Body() productCreateData: ProductCreateDTO,
+    @Res() res: Response
+  ) {
     const userPayload = req.user as IUserPayload;
     const moderator = await this.moderatorService.getByUniqueParams({
       where: {
         userId: userPayload.id,
-      },
+      }
     });
 
-    return this.productService.create(moderator, createProductDTO);
+    const product = await this.productService.create({
+      data: {
+        ...productCreateData,
+        moderatorId: moderator.id
+      }
+    });
+
+    res.status(200).json(product);
   }
 
+  @ApiOperation({ summary: 'Update Existing Product by Id' })
+  @ApiBody({
+    type: ProductUpdateDTO,
+    examples: {
+      'Moderator - Product': {
+        value: {
+          name: "FC Bayern Main T-shirt",
+          description: "T-shirt for adults (women)",
+          price: 3200,
+          imageUrl: "",
+          club: Club.BAYERN_MUNICH,
+          age: AgeCategory.ADULT,
+          gender: Gender.WOMEN
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 200, description: 'Product Successfully Updated' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Not Authorized' })
+  @ApiResponse({ status: 403, description: 'Not Authorized as Moderator' })
+  @ApiResponse({ status: 404, description: 'Product Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @UseGuards(AuthGuard, RoleGuard)
   @UseRole(Role.MODERATOR)
-  @ApiOperation({
-    summary: 'Update Existing Product',
-  })
-  @ApiOkResponse({
-    description: 'Successful Response',
-    type: GetProductDTO,
-  })
-  @ApiNotFoundResponse({ description: 'Not Found' })
-  @ApiBadRequestResponse({ description: 'Invalid Input' })
-  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateProductDTO: UpdateProductDTO) {
-    return this.productService.update(id, updateProductDTO);
-  }
+  @Patch(':productId')
+  public async update(
+    @Param('productId') productId: string,
+    @Body() productUpdateData: ProductUpdateDTO,
+    @Res() res: Response
+  ): Promise<Response | void> {
+    const product = await this.productService.update({
+      where: {
+        id: productId
+      },
+      data: productUpdateData
+    });
 
-  @UseGuards(AuthGuard, RoleGuard)
-  @UseRole(Role.MODERATOR)
-  @ApiOperation({
-    summary: 'Delete product',
-  })
-  @ApiNoContentResponse({
-    description: 'Successful Response',
-  })
-  @ApiNotFoundResponse({ description: 'Not Found' })
-  @ApiBadRequestResponse({ description: 'Invalid Input' })
-  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
-    await this.productService.delete(id);
+    res.status(200).json(product);
   }
 }

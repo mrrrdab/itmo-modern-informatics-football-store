@@ -10,8 +10,8 @@ import {
 import { Request, Response } from 'express';
 
 import { JWT, JWTProvider } from '@/utils';
-import { UserService } from '@/domain/user/user.service';
-import { IUserPayload } from '@/domain/user/types';
+import { UserService } from '@/domain/user/service/user.service';
+import { IUserPayload } from '@/domain/user';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -75,6 +75,14 @@ export class AuthGuard implements CanActivate {
 
     if (userPayload.lastName) {
       refreshUserPayload.lastName = userPayload.lastName;
+    }
+
+    if (userPayload.birthDate) {
+      refreshUserPayload.birthDate = userPayload.birthDate;
+    }
+
+    if (userPayload.phoneNumber) {
+      refreshUserPayload.phoneNumber = userPayload.phoneNumber;
     }
 
     return refreshUserPayload;

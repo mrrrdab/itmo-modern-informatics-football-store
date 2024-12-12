@@ -5,5 +5,7 @@ export interface IUserPayload {
   email: string;
   firstName?: string;
   lastName?: string;
+  phoneNumber?: string;
+  birthDate?: Date;
   role: Role;
 }
