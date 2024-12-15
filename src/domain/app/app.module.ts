@@ -32,10 +32,10 @@ import { AppAllExceptionsFilter } from './filters';
     CartModule,
     OrderItemModule,
     OrderModule,
-    ProductModule,
     ClothingModule,
     FootwearModule,
     AccessoryModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [

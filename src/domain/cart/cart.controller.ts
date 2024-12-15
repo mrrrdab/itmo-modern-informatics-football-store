@@ -11,8 +11,10 @@ import { IUserPayload } from '../user';
 import { CustomerService } from '../user/entity/customer/customer.service';
 import { OrderItemService, OrderItemCreateDTO, OrderItemUpdateDTO } from '../order-item';
 
+import { ICartAccessory, ICartSize, ICartQuantity, CartStrategy } from './types';
 import { CartService } from './service/cart.service';
 import { CartFilter } from './service/cart.filter';
+import { CartControl } from './service/cart.control';
 import { CartAggregate } from './service/cart.aggregate';
 
 @ApiTags('Carts')
@@ -23,6 +25,7 @@ export class CartController {
   constructor(
     private readonly cartService: CartService,
     private readonly cartFilter: CartFilter,
+    private readonly cartControl: CartControl,
     private readonly cartAggregate: CartAggregate,
     private readonly customerService: CustomerService,
     private readonly orderItemService: OrderItemService,
@@ -43,7 +46,7 @@ export class CartController {
     });
 
     const cart = await this.cartFilter.querySQLFilter(customer.id);
-    res.status(200).json(cart);
+    res.status(200).json(cart[0]);
   }
 
   @ApiOperation({ summary: 'Add product to cart' })
@@ -83,6 +86,33 @@ export class CartController {
       },
     });
 
+    if (!orderItemCreateData.size) {
+      const product = (await this.cartControl.querySQLControl(
+        {
+          productId: orderItemCreateData.productId,
+        },
+        CartStrategy.accessory,
+      )) as ICartAccessory[];
+
+      if (!product[0]) {
+        return res.status(404).send(`No accessories were found for product with id: ${orderItemCreateData.productId}`);
+      }
+    } else {
+      const product = (await this.cartControl.querySQLControl(
+        {
+          productId: orderItemCreateData.productId,
+          size: orderItemCreateData.size,
+        },
+        CartStrategy.size,
+      )) as ICartSize[];
+
+      if (!product[0].clothingId && !product[0].footwearId) {
+        return res
+          .status(404)
+          .send(`Product with id: ${orderItemCreateData.productId} does not have size = '${orderItemCreateData.size}'`);
+      }
+    }
+
     await this.cartAggregate.applyAddItemToCartTransaction(cart, orderItemCreateData);
     res.status(200).send('Item successfully added to cart');
   }
@@ -110,6 +140,7 @@ export class CartController {
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Customer' })
   @ApiResponse({ status: 404, description: 'Order Item Not Found' })
+  @ApiResponse({ status: 409, description: 'Stock Quantity Conflict' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Patch('me/items/:orderItemId')
   public async updateItem(
@@ -125,20 +156,21 @@ export class CartController {
       },
     });
 
-    const cart = await this.cartService.getByUniqueParams({
-      where: {
+    const transactionData = (await this.cartControl.querySQLControl(
+      {
+        orderItemId: orderItemId,
         customerId: customer.id,
       },
-    });
+      CartStrategy.quantity,
+    )) as ICartQuantity[];
 
-    const orderItem = await this.orderItemService.getByUniqueParams({
-      where: {
-        id: orderItemId,
-        cartId: cart.id,
-      },
-    });
+    if (transactionData[0].stockQuantity < orderItemUpdateData.quantity) {
+      return res
+        .status(409)
+        .send(`There are only ${transactionData[0].stockQuantity} units of products in the warehouse`);
+    }
 
-    await this.cartAggregate.applyUpdateItemInCartTransaction(cart, orderItem, orderItemUpdateData);
+    await this.cartAggregate.applyUpdateItemInCartTransaction(transactionData[0], orderItemUpdateData);
     res.status(200).send('Item successfully updated');
   }
 

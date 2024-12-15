@@ -52,6 +52,9 @@ export class OrderController {
         ...this.orderFilter.getOrderPublicFields(),
         ...this.orderFilter.getOrderInclude(),
       },
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
 
     if (orders.length === 0) {

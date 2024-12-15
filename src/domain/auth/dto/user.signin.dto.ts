@@ -1,7 +1,5 @@
-import { IsNotEmpty, IsString, IsEmail, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-import { userCreateConfig } from '@/domain/user';
 
 export class UserSignInDTO {
   @ApiProperty({
@@ -21,8 +19,5 @@ export class UserSignInDTO {
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(userCreateConfig.passwordRule, {
-    message: userCreateConfig.passwordMessage,
-  })
   public password: string;
 }

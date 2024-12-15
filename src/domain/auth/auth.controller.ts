@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Param, Body, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { CryptoProvider, JWT, MailerProvider } from '@/utils';
 
@@ -145,25 +146,34 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, description: 'Successful Response (The account was created but not activated)' })
   @ApiResponse({ status: 400, description: 'Invalid Syntax' })
+  @ApiResponse({ status: 409, description: 'Email Conflict' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post('sign-up')
   public async signup(@Body() userSignupData: UserSignUpDTO, @Res() res: Response): Promise<Response | void> {
-    userSignupData.password = await this.crypto.hashStringBySHA256(userSignupData.password);
-    const verifToken = this.crypto.generateSecureVerifToken(6);
+    try {
+      userSignupData.password = await this.crypto.hashStringBySHA256(userSignupData.password);
+      const verifToken = this.crypto.generateSecureVerifToken(6);
 
-    await this.userAggregate.applySignupTransaction(userSignupData, {
-      token: verifToken,
-    });
-
-    await this.mailer.getTransporter().sendMail({
-      to: userSignupData.email,
-      subject: this.authEmailTemplate.getEmailSubject(AuthEmailSubject.activateAccount),
-      html: this.authEmailTemplate.createActivationEmail({
+      await this.userAggregate.applySignupTransaction(userSignupData, {
         token: verifToken,
-      }),
-    });
+      });
 
-    res.status(200).send(`Verification letter successfully sent to your email - ${userSignupData.email}`);
+      await this.mailer.getTransporter().sendMail({
+        to: userSignupData.email,
+        subject: this.authEmailTemplate.getEmailSubject(AuthEmailSubject.activateAccount),
+        html: this.authEmailTemplate.createActivationEmail({
+          token: verifToken,
+        }),
+      });
+
+      res.status(200).send(`Verification letter successfully sent to your email - ${userSignupData.email}`);
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError && err.code === 'P2002') {
+        return res.status(409).send('A user with this email already exists');
+      }
+
+      throw err;
+    }
   }
 
   @ApiOperation({ summary: 'Sign Out' })

@@ -2,6 +2,7 @@ import { Controller, Post, Patch, Res, Param, Body, UseGuards } from '@nestjs/co
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Role } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { AuthGuard, RoleGuard } from '@/domain/auth';
 import { UseRole } from '@/utils';
@@ -33,11 +34,20 @@ export class AccessoryController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 401, description: 'Not Authorized' })
   @ApiResponse({ status: 403, description: 'Not Authorized as Moderator' })
+  @ApiResponse({ status: 409, description: 'Accessory Conflict' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post()
   public async create(@Body() accessoryCreateData: AccessoryCreateDTO, @Res() res: Response): Promise<Response | void> {
-    const accessory = await this.accessoryService.create(accessoryCreateData);
-    res.status(200).json(accessory);
+    try {
+      const accessory = await this.accessoryService.create(accessoryCreateData);
+      res.status(200).json(accessory);
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError && err.code === 'P2002') {
+        return res.status(409).send('An accessory with this product id already exists');
+      }
+
+      throw err;
+    }
   }
 
   @ApiOperation({ summary: 'Update accessory' })

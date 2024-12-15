@@ -2,7 +2,6 @@
 import { Injectable } from '@nestjs/common';
 
 import { EmailTemplate } from '@/abstract/email';
-import { userCreateConfig } from '@/domain/user';
 
 import { AuthEmailSubject } from '../types';
 import { TokenVerifDTO } from '../dto';
@@ -30,8 +29,6 @@ export class AuthEmailTemplate extends EmailTemplate {
   }
 
   public createRecoverEmail(password: string): string {
-    userCreateConfig.testPassword(password);
-
     return this.emailConstructor(
       `<p>Please use this temporary password to log in: <strong>${password}</strong></p>
       <p><strong>We strongly recommend that you change your password immediately after you log in.</strong></p>`,
