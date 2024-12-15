@@ -6,6 +6,8 @@ import { PrismaService } from '@/database/prisma';
 import { OrderItemCreateDTO, OrderItemUpdateDTO } from '@/domain/order-item';
 import { OrderItemRelations } from '@/domain/order-item/types/order-item.relations.type';
 
+import { ICartQuantity } from '../types';
+
 @Injectable()
 export class CartAggregate {
   constructor(private readonly prismaService: PrismaService) {}
@@ -39,45 +41,37 @@ export class CartAggregate {
   }
 
   public async applyUpdateItemInCartTransaction(
-    cart: Cart,
-    orderItem: OrderItem,
+    transactionData: ICartQuantity,
     orderItemUpdateData: OrderItemUpdateDTO,
   ): Promise<void> {
     await this.prismaService.$transaction(async (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
-      const updatedOrderItem = (await prisma.orderItem.update({
+      const updatedOrderItem = await prisma.orderItem.update({
         where: {
-          id: orderItem.id,
+          id: transactionData.orderItemId,
         },
         data: orderItemUpdateData,
-        include: {
-          product: true,
-        },
-      })) as OrderItemRelations;
+      });
 
-      if (!updatedOrderItem.product) {
-        throw new Error('Order item must contain product');
-      }
+      const oldPrice: number = Number(transactionData.productPrice) * transactionData.orderItemQuantity;
+      const newPrice: number = Number(transactionData.productPrice) * updatedOrderItem.quantity;
 
-      const oldPrice: number = Number(updatedOrderItem.product.price) * orderItem.quantity;
-      const newPrice: number = Number(updatedOrderItem.product.price) * updatedOrderItem.quantity;
-
-      const quantityDiff: number = Math.abs(orderItem.quantity - updatedOrderItem.quantity);
+      const quantityDiff: number = Math.abs(transactionData.orderItemQuantity - updatedOrderItem.quantity);
       const priceDiff: number = Math.abs(newPrice - oldPrice);
 
-      let newCartQunatity: number = cart.quantity;
-      let newCartTotal: number = Number(cart.total);
+      let newCartQunatity: number = transactionData.cartQuantity;
+      let newCartTotal: number = Number(transactionData.cartTotal);
 
-      if (orderItem.quantity > updatedOrderItem.quantity) {
-        newCartQunatity = cart.quantity - quantityDiff;
-        newCartTotal = Number(cart.total) - priceDiff;
-      } else if (orderItem.quantity < updatedOrderItem.quantity) {
-        newCartQunatity = cart.quantity + quantityDiff;
-        newCartTotal = Number(cart.total) + priceDiff;
+      if (transactionData.orderItemQuantity > updatedOrderItem.quantity) {
+        newCartQunatity = transactionData.cartQuantity - quantityDiff;
+        newCartTotal = Number(transactionData.cartTotal) - priceDiff;
+      } else if (transactionData.orderItemQuantity < updatedOrderItem.quantity) {
+        newCartQunatity = transactionData.cartQuantity + quantityDiff;
+        newCartTotal = Number(transactionData.cartTotal) + priceDiff;
       }
 
       await prisma.cart.update({
         where: {
-          id: cart.id,
+          id: transactionData.cartId,
         },
         data: {
           total: newCartTotal,

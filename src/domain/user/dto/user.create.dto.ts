@@ -1,8 +1,6 @@
-import { IsNotEmpty, IsOptional, IsEnum, IsString, IsEmail, Matches, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsEnum, IsString, IsEmail, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-
-import { userCreateConfig } from '../user.create.config';
 
 export class UserCreateDTO {
   @ApiProperty({
@@ -22,9 +20,6 @@ export class UserCreateDTO {
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(userCreateConfig.passwordRule, {
-    message: userCreateConfig.passwordMessage,
-  })
   public password: string;
 
   @ApiProperty({

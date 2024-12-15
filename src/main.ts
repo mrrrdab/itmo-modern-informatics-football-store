@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import CookieSerializer from 'cookie-parser';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 import { AppModule } from './domain/app';
 
@@ -12,6 +13,14 @@ const bootstrap = async () => {
   const configService = app.get(ConfigService);
   const port = configService.get('port');
 
+  const corsOptions: CorsOptions = {
+    origin: true,
+    methods: 'GET, POST, PUT, DELETE, PATCH',
+    allowedHeaders: 'Content-Type, Authorization, X-Requested-With',
+    credentials: true,
+  };
+
+  app.enableCors(corsOptions);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsDate, IsString, IsEmail, IsPhoneNumber, Matches } from 'class-validator';
+import { IsNotEmpty, IsDate, IsString, IsEmail, Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -22,9 +22,6 @@ export class UserSignUpDTO {
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(userCreateConfig.passwordRule, {
-    message: userCreateConfig.passwordMessage,
-  })
   public password: string;
 
   @ApiProperty({
@@ -62,6 +59,8 @@ export class UserSignUpDTO {
     required: false,
   })
   @IsNotEmpty()
-  @IsPhoneNumber()
+  @Matches(userCreateConfig.phoneNummber.rule, {
+    message: userCreateConfig.phoneNummber.message,
+  })
   public phoneNumber: string;
 }

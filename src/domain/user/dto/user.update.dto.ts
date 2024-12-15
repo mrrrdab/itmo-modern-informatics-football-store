@@ -1,7 +1,5 @@
-import { IsOptional, IsString, IsEmail, Matches } from 'class-validator';
+import { IsOptional, IsString, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-import { userCreateConfig } from '../user.create.config';
 
 export class UserUpdateDTO {
   @ApiProperty({
@@ -18,8 +16,5 @@ export class UserUpdateDTO {
   })
   @IsOptional()
   @IsString()
-  @Matches(userCreateConfig.passwordRule, {
-    message: userCreateConfig.passwordMessage,
-  })
   public password: string;
 }

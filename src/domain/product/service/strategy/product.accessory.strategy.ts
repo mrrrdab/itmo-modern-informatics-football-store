@@ -22,7 +22,7 @@ export class ProductAccessoryStrategy implements IProductFilterStrategy {
         public."Accessory" rel_mod ON p.id = rel_mod."productId"
       ${Prisma.raw(whereConditions)}
       GROUP BY
-        p.id, p.name, p.description, p.price, p.club, p.category, p.age, p.gender, rel_mod.id
+        p.id, p.name, p.description, p.price, p.club, p.category, p.age, p.gender
     `;
   }
 }
