@@ -74,10 +74,9 @@ export class AuthController {
     });
 
     const newPassword = splittedToken.join('');
-    const hashNewPassword = await this.crypto.hashStringBySHA256(newPassword);
 
     await this.userService.update(user.id, {
-      password: hashNewPassword,
+      password: newPassword,
     });
 
     await this.mailer.getTransporter().sendMail({

@@ -73,7 +73,7 @@ CREATE TABLE "EmailVerification" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "verifToken" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "expiresAt" TIMESTAMPTZ(3) NOT NULL DEFAULT NOW() + interval '1 hour',
+    "expiresAt" TIMESTAMPTZ(3) NOT NULL DEFAULT (now() + '01:00:00'::interval),
     "userId" UUID NOT NULL,
 
     CONSTRAINT "EmailVerification_pkey" PRIMARY KEY ("id")
@@ -92,6 +92,7 @@ CREATE TABLE "Product" (
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,
     "moderatorId" UUID NOT NULL,
+    "imageUrl" TEXT NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -152,6 +153,7 @@ CREATE TABLE "Order" (
 -- CreateTable
 CREATE TABLE "OrderItem" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "total" DECIMAL(65,30) NOT NULL,
     "quantity" INTEGER NOT NULL DEFAULT 1,
     "size" TEXT,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -165,9 +167,6 @@ CREATE TABLE "OrderItem" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "User_password_key" ON "User"("password");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_refreshToken_key" ON "User"("refreshToken");
@@ -188,25 +187,19 @@ CREATE UNIQUE INDEX "EmailVerification_verifToken_key" ON "EmailVerification"("v
 CREATE UNIQUE INDEX "EmailVerification_userId_key" ON "EmailVerification"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Product_moderatorId_key" ON "Product"("moderatorId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Accessory_productId_key" ON "Accessory"("productId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Cart_customerId_key" ON "Cart"("customerId");
 
--- CreateIndex
-CREATE UNIQUE INDEX "OrderItem_productId_key" ON "OrderItem"("productId");
-
 -- AddForeignKey
 ALTER TABLE "Administrator" ADD CONSTRAINT "Administrator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Moderator" ADD CONSTRAINT "Moderator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Moderator" ADD CONSTRAINT "Moderator_administratorId_fkey" FOREIGN KEY ("administratorId") REFERENCES "Administrator"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Moderator" ADD CONSTRAINT "Moderator_administratorId_fkey" FOREIGN KEY ("administratorId") REFERENCES "Administrator"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Moderator" ADD CONSTRAINT "Moderator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Customer" ADD CONSTRAINT "Customer_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -233,10 +226,10 @@ ALTER TABLE "Cart" ADD CONSTRAINT "Cart_customerId_fkey" FOREIGN KEY ("customerI
 ALTER TABLE "Order" ADD CONSTRAINT "Order_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

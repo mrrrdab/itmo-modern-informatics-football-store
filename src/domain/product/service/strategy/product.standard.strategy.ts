@@ -10,7 +10,8 @@ export class ProductStandardStrategy implements IProductFilterStrategy {
         p.id,
         p.name,
         p.description,
-        p.price,
+        CAST(p.price AS FLOAT) AS price,
+        p."imageUrl",
         p.club,
         p.category,
         p.age,
@@ -35,7 +36,7 @@ export class ProductStandardStrategy implements IProductFilterStrategy {
         public."Accessory" a ON p.id = a."productId"
       WHERE (c.id IS NOT NULL OR f.id IS NOT NULL OR a.id IS NOT NULL) ${Prisma.raw(whereConditions)}
       GROUP BY
-        p.id, p.name, p.description, p.price, p.club, p.category, p.age, p.gender;
+        p.id, p.name, p.description, CAST(p.price AS FLOAT), p."imageUrl", p.club, p.category, p.age, p.gender
     `;
   }
 }

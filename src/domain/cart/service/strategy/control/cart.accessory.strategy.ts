@@ -7,6 +7,7 @@ export class CartAccessoryStrategy implements ICartControl {
     return Prisma.sql`
       SELECT
         p.id,
+        p.price,
         p.category,
         a.id AS "accessoryId"
       FROM

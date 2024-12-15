@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { Role, ClothingSize } from '@prisma/client';
+import { Prisma, Role, ClothingSize } from '@prisma/client';
 
 import { UseRole } from '@/utils';
 
@@ -86,6 +86,8 @@ export class CartController {
       },
     });
 
+    let productPrice: Prisma.Decimal = new Prisma.Decimal(0);
+
     if (!orderItemCreateData.size) {
       const product = (await this.cartControl.querySQLControl(
         {
@@ -97,6 +99,8 @@ export class CartController {
       if (!product[0]) {
         return res.status(404).send(`No accessories were found for product with id: ${orderItemCreateData.productId}`);
       }
+
+      productPrice = product[0].price;
     } else {
       const product = (await this.cartControl.querySQLControl(
         {
@@ -111,9 +115,15 @@ export class CartController {
           .status(404)
           .send(`Product with id: ${orderItemCreateData.productId} does not have size = '${orderItemCreateData.size}'`);
       }
+
+      productPrice = product[0].productPrice;
     }
 
-    await this.cartAggregate.applyAddItemToCartTransaction(cart, orderItemCreateData);
+    await this.cartAggregate.applyAddItemToCartTransaction(cart, {
+      ...orderItemCreateData,
+      total: productPrice
+    });
+
     res.status(200).send('Item successfully added to cart');
   }
 

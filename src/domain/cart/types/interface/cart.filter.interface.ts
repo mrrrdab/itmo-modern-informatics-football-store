@@ -1,10 +1,10 @@
-import { OrderItem } from '@prisma/client';
+import { IOrderItem } from '@/domain/order-item/types/order-item.interface';
 
 export interface ICartFilter {
   id: string;
   total: number;
   quantity: number;
-  orderItems: (OrderItem & {
+  orderItems: (IOrderItem & {
     stockQuantity: number;
   })[];
 }

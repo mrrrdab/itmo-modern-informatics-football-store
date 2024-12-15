@@ -7,6 +7,8 @@ export class CartSizeStrategy implements ICartControl {
     const size = cartControlData.size as string;
     return Prisma.sql`
       SELECT
+        p.id AS "productId",
+        p.price AS "productPrice",
         cl.id AS "clothingId",
         f.id AS "footwearId"
       FROM

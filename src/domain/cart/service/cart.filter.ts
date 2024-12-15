@@ -13,19 +13,16 @@ export class CartFilter {
     const result = (await this.prismaService.$queryRaw`
       SELECT
         c.id,
-        c.total,
+        CAST(c.total AS FLOAT) AS total,
         c.quantity,
         COALESCE(
           JSON_AGG(
             JSON_BUILD_OBJECT(
               'id', oi.id,
+              'total', CAST(oi.total AS FLOAT),
               'quantity', oi.quantity,
               'size', oi.size,
-              'createdAt', oi."createdAt",
-              'updatedAt', oi."updatedAt",
               'productId', oi."productId",
-              'orderId', oi."orderId",
-              'cartId', oi."cartId",
               'stockQuantity', COALESCE(cl."stockQuantity", f."stockQuantity", a."stockQuantity")
             )
           ) FILTER (WHERE oi.id IS NOT NULL),
@@ -44,7 +41,7 @@ export class CartFilter {
         public."Accessory" a ON p.id = a."productId"
       WHERE c."customerId" = '${Prisma.raw(customerId)}'
       GROUP BY
-        c.id, c.total, c.quantity
+        c.id, CAST(c.total AS FLOAT), c.quantity
     `) as ICartFilter[];
 
     return result;

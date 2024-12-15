@@ -44,18 +44,7 @@ export class OrderController {
       },
     });
 
-    const orders = await this.orderService.getAll({
-      where: {
-        customerId: customer.id,
-      },
-      select: {
-        ...this.orderFilter.getOrderPublicFields(),
-        ...this.orderFilter.getOrderInclude(),
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+    const orders = await this.orderFilter.querySQLFilter(customer.id);
 
     if (orders.length === 0) {
       return res.status(404).send('Orders were not found');

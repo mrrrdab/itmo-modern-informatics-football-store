@@ -3,8 +3,6 @@ import { Prisma, OrderItem } from '@prisma/client';
 
 import { PrismaService } from '@/database/prisma';
 
-import { OrderItemCreateDTO } from './dto';
-
 @Injectable()
 export class OrderItemService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -17,17 +15,6 @@ export class OrderItemService {
     }
 
     return orderItem;
-  }
-
-  public async create(cartId: string, orderItemCreateData: OrderItemCreateDTO): Promise<OrderItem> {
-    const newOrderItem = await this.prismaService.orderItem.create({
-      data: {
-        ...orderItemCreateData,
-        cartId: cartId,
-      },
-    });
-
-    return newOrderItem;
   }
 
   public async update(orderItemUpdateData: Prisma.OrderItemUpdateArgs): Promise<OrderItem> {

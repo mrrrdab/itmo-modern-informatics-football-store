@@ -7,6 +7,7 @@ export class CartQuantityStrategy implements ICartControl {
     return Prisma.sql`
       SELECT
         oi.id AS "orderItemId",
+        oi.total AS "orderItemTotal",
         oi.quantity AS "orderItemQuantity",
         p.price AS "productPrice",
         c.id AS "cartId",
@@ -27,7 +28,7 @@ export class CartQuantityStrategy implements ICartControl {
         public."Accessory" a ON p.id = a."productId"
       WHERE c."customerId" = '${Prisma.raw(cartControlData.customerId as string)}'
       GROUP BY
-        oi.id, oi.quantity, p.price, c.id, c.quantity, c.total, cl."stockQuantity", f."stockQuantity", a."stockQuantity"
+        oi.id, oi.total, oi.quantity, p.price, c.id, c.quantity, c.total, cl."stockQuantity", f."stockQuantity", a."stockQuantity"
     `;
   }
 }

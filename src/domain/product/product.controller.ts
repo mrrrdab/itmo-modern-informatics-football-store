@@ -8,7 +8,7 @@ import { UseRole } from '@/utils';
 import { AuthGuard, RoleGuard } from '../auth';
 import { IUserPayload, ModeratorService } from '../user';
 
-import { ProductCreateDTO, ProductUpdateDTO, ProductFilterDTO, ProductAdditionalWhereDTO } from './dto';
+import { ProductCreateDTO, ProductUpdateDTO, ProductFilterDTO } from './dto';
 import { ProductService } from './service/product.service';
 import { ProductFilter } from './service/product.filter';
 
@@ -78,7 +78,7 @@ export class ProductController {
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @UseGuards(AuthGuard, RoleGuard)
   @UseRole(Role.MODERATOR)
-  @Post('create')
+  @Post()
   public async create(@Req() req: Request, @Body() productCreateData: ProductCreateDTO, @Res() res: Response) {
     const userPayload = req.user as IUserPayload;
     const moderator = await this.moderatorService.getByUniqueParams({

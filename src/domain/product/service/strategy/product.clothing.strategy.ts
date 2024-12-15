@@ -10,7 +10,8 @@ export class ProductClothingStrategy implements IProductFilterStrategy {
         p.id,
         p.name,
         p.description,
-        p.price,
+        CAST(p.price AS FLOAT) AS price,
+        p."imageUrl",
         p.club,
         p.category,
         p.age,
@@ -22,7 +23,7 @@ export class ProductClothingStrategy implements IProductFilterStrategy {
         public."Clothing" rel_mod ON p.id = rel_mod."productId"
       ${Prisma.raw(whereConditions)}
       GROUP BY
-        p.id, p.name, p.description, p.price, p.club, p.category, p.age, p.gender
+        p.id, p.name, p.description, CAST(p.price AS FLOAT), p."imageUrl", p.club, p.category, p.age, p.gender
     `;
   }
 }

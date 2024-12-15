@@ -13,14 +13,16 @@ export interface ICartControl {
 
 export interface ICartAccessory {
   id: string;
+  price: Prisma.Decimal;
   category: ProductCategory;
   accessoryId: string;
 }
 
 export interface ICartQuantity {
   orderItemId: string;
+  orderItemTotal: Prisma.Decimal;
   orderItemQuantity: number;
-  productPrice: number;
+  productPrice: Prisma.Decimal;
   cartId: string;
   cartQuantity: number;
   cartTotal: number;
@@ -28,6 +30,8 @@ export interface ICartQuantity {
 }
 
 export interface ICartSize {
+  productId: string;
+  productPrice: Prisma.Decimal;
   clothingId: string;
   footwearId: string;
 }

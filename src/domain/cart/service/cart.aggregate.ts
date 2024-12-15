@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, Cart, OrderItem } from '@prisma/client';
+import { PrismaClient, Cart, OrderItem, Prisma } from '@prisma/client';
 import { ITXClientDenyList } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '@/database/prisma';
-import { OrderItemCreateDTO, OrderItemUpdateDTO } from '@/domain/order-item';
-import { OrderItemRelations } from '@/domain/order-item/types/order-item.relations.type';
+import { OrderItemUpdateDTO } from '@/domain/order-item';
 
 import { ICartQuantity } from '../types';
 
@@ -12,28 +11,21 @@ import { ICartQuantity } from '../types';
 export class CartAggregate {
   constructor(private readonly prismaService: PrismaService) {}
 
-  public async applyAddItemToCartTransaction(cart: Cart, orderItemCreateData: OrderItemCreateDTO): Promise<void> {
+  public async applyAddItemToCartTransaction(cart: Cart, orderItemCreateData: Prisma.OrderItemUncheckedCreateInput): Promise<void> {
     await this.prismaService.$transaction(async (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
       const orderItem = (await prisma.orderItem.create({
         data: {
           ...orderItemCreateData,
           cartId: cart.id,
-        },
-        include: {
-          product: true,
-        },
-      })) as OrderItemRelations;
-
-      if (!orderItem.product) {
-        throw new Error('Order item must contain product');
-      }
+        }
+      }));
 
       await prisma.cart.update({
         where: {
           id: cart.id,
         },
         data: {
-          total: Number(cart.total) + Number(orderItem.product.price),
+          total: Number(cart.total) + Number(orderItem.total),
           quantity: cart.quantity + orderItem.quantity,
         },
       });
@@ -49,25 +41,14 @@ export class CartAggregate {
         where: {
           id: transactionData.orderItemId,
         },
-        data: orderItemUpdateData,
+        data: {
+          ...orderItemUpdateData,
+          total: orderItemUpdateData.quantity * Number(transactionData.productPrice)
+        },
       });
 
-      const oldPrice: number = Number(transactionData.productPrice) * transactionData.orderItemQuantity;
-      const newPrice: number = Number(transactionData.productPrice) * updatedOrderItem.quantity;
-
-      const quantityDiff: number = Math.abs(transactionData.orderItemQuantity - updatedOrderItem.quantity);
-      const priceDiff: number = Math.abs(newPrice - oldPrice);
-
-      let newCartQunatity: number = transactionData.cartQuantity;
-      let newCartTotal: number = Number(transactionData.cartTotal);
-
-      if (transactionData.orderItemQuantity > updatedOrderItem.quantity) {
-        newCartQunatity = transactionData.cartQuantity - quantityDiff;
-        newCartTotal = Number(transactionData.cartTotal) - priceDiff;
-      } else if (transactionData.orderItemQuantity < updatedOrderItem.quantity) {
-        newCartQunatity = transactionData.cartQuantity + quantityDiff;
-        newCartTotal = Number(transactionData.cartTotal) + priceDiff;
-      }
+      const newCartTotal: number = Number(transactionData.cartTotal) - Number(transactionData.orderItemTotal) + Number(updatedOrderItem.total);
+      const newCartQuantity: number = transactionData.cartQuantity - transactionData.orderItemQuantity + updatedOrderItem.quantity;
 
       await prisma.cart.update({
         where: {
@@ -75,7 +56,7 @@ export class CartAggregate {
         },
         data: {
           total: newCartTotal,
-          quantity: newCartQunatity,
+          quantity: newCartQuantity,
         },
       });
     });
@@ -83,25 +64,21 @@ export class CartAggregate {
 
   public async applyRemoveItemFromCartTransaction(orderItem: OrderItem, cart: Cart): Promise<void> {
     await this.prismaService.$transaction(async (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
-      const deletedOrderItem = (await this.prismaService.orderItem.delete({
+      const deletedOrderItem = (await prisma.orderItem.delete({
         where: {
           id: orderItem.id,
         },
         include: {
           product: true,
         },
-      })) as OrderItemRelations;
+      }));
 
-      if (!deletedOrderItem.product) {
-        throw new Error('Order item must contain product');
-      }
-
-      await this.prismaService.cart.update({
+      await prisma.cart.update({
         where: {
           id: cart.id,
         },
         data: {
-          total: Number(cart.total) - Number(deletedOrderItem.product.price) * orderItem.quantity,
+          total: Number(cart.total) - Number(deletedOrderItem.total),
           quantity: cart.quantity - orderItem.quantity,
         },
       });
