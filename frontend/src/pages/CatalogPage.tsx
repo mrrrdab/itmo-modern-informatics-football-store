@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { FOOTBALL_CLUBS, FOOTBALL_CLUBS_LABELS } from '@/constants';
+import { FOOTBALL_CLUBS, FOOTBALL_CLUBS_LABELS, FOOTBALL_CLUBS_LOGOS } from '@/constants';
 import type { ProductsFilters } from '@/types';
 import type { ApiError, GetAgeDTO, GetCategoryDTO, GetFootballClubDTO, GetGenderDTO } from '@/api';
 import { useGetCartQuery, useGetProductsQuery } from '@/hooks';
@@ -65,7 +65,10 @@ export const CatalogPage = () => {
   return (
     <React.Fragment>
       <div className="flex gap-6 p-4 flex-col lg:flex-row">
-        <div className="lg:w-1/3 xl:w-1/4">
+        <div className="flex flex-col gap-4 lg:w-1/3 xl:w-1/4">
+          <div className="border-2 border-zinc-900 rounded-lg shadow-md py-4">
+            <img src={FOOTBALL_CLUBS_LOGOS[filters.club]} alt={filters.club} className="mx-auto w-fit h-32" />
+          </div>
           <FiltersSection
             category={filters.category}
             age={filters.age}

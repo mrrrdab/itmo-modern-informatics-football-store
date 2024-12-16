@@ -15,6 +15,14 @@ export const FOOTBALL_CLUBS: GetFootballClubDTO[] = [
   'HOFFENHEIM',
 ];
 
+export const FOOTBALL_CLUBS_LOGOS: Record<GetFootballClubDTO, string> = {
+  BAYERN_MUNICH: '/src/assets/images/clubs-logos/bayer-munich.png',
+  BORUSSIA_DORTMUND: '/src/assets/images/clubs-logos/borussia-dortmund.png',
+  RB_LEIPZIG: '/src/assets/images/clubs-logos/rb-leipzig.png',
+  BAYER_04_LEVERKUSEN: '/src/assets/images/clubs-logos/bayer-04-leverkusen.png',
+  HOFFENHEIM: '/src/assets/images/clubs-logos/hoffenheim.png',
+};
+
 export const FOOTBALL_CLUBS_LABELS: Record<GetFootballClubDTO, string> = {
   BAYERN_MUNICH: 'Bayern Munich',
   BORUSSIA_DORTMUND: 'Borussia Dortmund',
