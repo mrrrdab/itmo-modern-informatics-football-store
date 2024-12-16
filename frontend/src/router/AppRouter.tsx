@@ -31,7 +31,14 @@ export const AppRouter: React.FC = () => {
           <Route path={APP_ROUTER.RECOVER_PASSWORD} element={<RecoverPasswordPage />} />
           <Route path={APP_ROUTER.CATALOG} element={<CatalogPage />} />
           <Route path={`${APP_ROUTER.CATALOG}/:id`} element={<ProductPage />} />
-          <Route path={APP_ROUTER.SHOPPING_CART} element={<ShoppingCartPage />} />
+          <Route
+            path={APP_ROUTER.SHOPPING_CART}
+            element={
+              <ProtectedRoute>
+                <ShoppingCartPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path={APP_ROUTER.PROFILE}
             element={

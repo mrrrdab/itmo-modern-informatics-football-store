@@ -2,20 +2,25 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { APP_ROUTER, MODALS } from '@/constants';
-import { useGetUserPayloadQuery, useModal } from '@/hooks';
+import { useModal } from '@/hooks';
 
 import { Button } from '../shadcn';
 import { ModalBase } from '../common';
 
 export const EmailVerificationRequiredModal: React.FC = () => {
   const navigate = useNavigate();
-  const { data: userData } = useGetUserPayloadQuery();
 
-  const { closeModal } = useModal();
+  const { getModalState, closeModal } = useModal();
+
+  const modalArgs = getModalState<{ email: string }>(MODALS.EMAIL_VERIFICATION_REQUIRED).args;
 
   const handleModalClose = useCallback(() => {
     closeModal(MODALS.EMAIL_VERIFICATION_REQUIRED);
   }, [closeModal]);
+
+  if (!modalArgs) {
+    return null;
+  }
 
   return (
     <ModalBase
@@ -33,7 +38,7 @@ export const EmailVerificationRequiredModal: React.FC = () => {
           variant="secondary"
           onClick={() => {
             handleModalClose();
-            navigate(APP_ROUTER.EMAIL_VERIFICATION, { state: { email: userData?.email } });
+            navigate(APP_ROUTER.EMAIL_VERIFICATION, { state: { email: modalArgs.email } });
           }}
         >
           Verify Account

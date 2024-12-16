@@ -44,7 +44,7 @@ export const SignInForm: React.FC = () => {
           setError('email', { message: 'Invalid credentials' });
           setError('password', { message: 'Invalid credentials' });
         } else if (apiError.status === 403) {
-          openModal(MODALS.EMAIL_VERIFICATION_REQUIRED);
+          openModal(MODALS.EMAIL_VERIFICATION_REQUIRED, { email: data.email });
         } else {
           openAlert('Something went wrong!', 'destructive');
         }
