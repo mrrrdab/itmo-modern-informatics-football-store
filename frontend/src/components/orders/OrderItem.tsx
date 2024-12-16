@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { APP_ROUTER, ORDER_STATUSES_LABELS } from '@/constants';
 import type { GetOrderDTO } from '@/api';
-import { useGetCartProductsQuery } from '@/hooks';
+import { useGetProductsByIdsQuery } from '@/hooks';
 import { formatDate } from '@/utils';
 
 import { ErrorMessage } from '../common';
@@ -19,7 +19,7 @@ export const OrderItem: React.FC<OrderItemProps> = ({ id, total, quantity, statu
     data: products,
     isLoading: isLoadingProducts,
     isError: isErrorProducts,
-  } = useGetCartProductsQuery(productIds);
+  } = useGetProductsByIdsQuery(productIds);
 
   return (
     <Card>

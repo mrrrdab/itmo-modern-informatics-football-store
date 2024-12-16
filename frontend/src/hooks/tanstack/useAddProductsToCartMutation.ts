@@ -6,11 +6,15 @@ import type { ApiError, AddProductToCartDTO } from '@/api';
 export const useAddProductsToCartMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<void[], ApiError, AddProductToCartDTO[]>({
+  return useMutation<void, ApiError, AddProductToCartDTO[]>({
     mutationKey: ['cart'],
-    mutationFn: (data: AddProductToCartDTO[]) => Promise.all(data.map(productData => addProductToCart(productData))),
+    mutationFn: async (data: AddProductToCartDTO[]) => {
+      for (const productData of data) {
+        await addProductToCart(productData);
+      }
+    },
     retry: 3,
-    onSettled: () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
   });

@@ -35,7 +35,7 @@ export const getProducts = async (filters: GetProductsQueryParams): Promise<GetP
   }
 
   if (filters.maxPrice !== undefined) {
-    queryParams.set('price[lt]', filters.maxPrice.toString());
+    queryParams.set('price[lte]', filters.maxPrice.toString());
   }
 
   const response = await fetch(`${import.meta.env.VITE_API_DOMAIN}/products?${queryParams}`);

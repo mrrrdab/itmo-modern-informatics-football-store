@@ -8,6 +8,7 @@ import { cn } from '@/utils';
 import DeleteIcon from '@/assets/icons/delete.svg?react';
 
 import { Button, Input, Skeleton } from '../shadcn';
+import { SizeOption } from '../common';
 
 type CartItemProps = {
   id: string;
@@ -24,6 +25,7 @@ export const CartItem: React.FC<CartItemProps> = ({
   id,
   productId,
   total,
+  size,
   quantity,
   stockQuantity,
   onQuantityChange,
@@ -61,14 +63,14 @@ export const CartItem: React.FC<CartItemProps> = ({
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between p-4 border-2 border-zinc-900 rounded-md">
-      <div className="flex gap-4 lg:w-3/5">
+      <div className="flex items-center gap-4 lg:w-3/5">
         {isLoadingProduct ? (
-          <Skeleton className="w-20 h-20" />
+          <Skeleton className="w-20 h-32" />
         ) : (
           <img
             src={product?.imageUrl}
             alt={product?.name}
-            className="w-20 h-20 object-cover rounded-md cursor-pointer"
+            className="w-20 h-32 object-cover rounded-md cursor-pointer"
             onClick={handleViewProduct}
           />
         )}
@@ -81,6 +83,11 @@ export const CartItem: React.FC<CartItemProps> = ({
                 <p className="font-semibold cursor-pointer max-w-[200px]" onClick={handleViewProduct}>
                   {product?.name}
                 </p>
+              )}
+              {size && (
+                <div className="w-fit">
+                  <SizeOption size={size} isSelected disabled />
+                </div>
               )}
               <p className="font-semibold truncate lg:hidden">${total.toFixed(2)}</p>
             </div>

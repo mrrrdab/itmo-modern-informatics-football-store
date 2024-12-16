@@ -1,6 +1,11 @@
 /* eslint-disable max-len */
+import { useEffect, useState } from 'react';
+
 import { AGE_OPTIONS, CATEGORY_OPTIONS, GENDER_OPTIONS } from '@/constants';
-import type { GetAgeDTO, GetGenderDTO, GetCategoryDTO, GetProductsQueryParams } from '@/api';
+import type { ProductsFilters } from '@/types';
+import type { GetAgeDTO, GetGenderDTO, GetCategoryDTO } from '@/api';
+import { useDebounce } from '@/hooks';
+import { cn } from '@/utils';
 
 import {
   Select,
@@ -12,13 +17,17 @@ import {
   Button,
   RadioGroup,
   RadioGroupItem,
+  LabeledSlider,
 } from '../shadcn';
 
 type FiltersSectionProps = {
   category: GetCategoryDTO;
   age: GetAgeDTO;
   gender: GetGenderDTO;
-  onFilterChange: (data: GetProductsQueryParams) => void;
+  maxProductPrice: number | null;
+  maxPriceFilter: number | null;
+  setMaxPriceFilter: (maxPrice: number) => void;
+  onFilterChange: (data: Partial<ProductsFilters>) => void;
   onResetFilters: () => void;
 };
 
@@ -26,19 +35,32 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   category,
   age,
   gender,
+  maxProductPrice,
+  maxPriceFilter,
+  setMaxPriceFilter,
   onFilterChange,
   onResetFilters,
 }) => {
+  const [maxPrice, setMaxPrice] = useState(maxPriceFilter);
+  const debouncedMaxPrice = useDebounce(maxPrice);
+
+  useEffect(() => {
+    setMaxPrice(maxPriceFilter);
+  }, [maxPriceFilter]);
+
+  useEffect(() => {
+    if (debouncedMaxPrice !== null) {
+      setMaxPriceFilter(debouncedMaxPrice);
+    }
+  }, [debouncedMaxPrice, setMaxPriceFilter]);
+
   return (
     <div className="h-fit p-6 bg-zinc-950 bg-opacity-90 backdrop-blur-sm border-2 border-zinc-900 rounded-lg shadow-md">
       <h2 className="text-lg font-bold mb-4 text-center zinc-900">Filters</h2>
       <div className="flex flex-col gap-6 mb-8">
         <div>
           <h3 className="font-semibold mb-2">Category</h3>
-          <RadioGroup
-            value={category}
-            onValueChange={value => onFilterChange({ category: value as GetCategoryDTO, age, gender })}
-          >
+          <RadioGroup value={category} onValueChange={value => onFilterChange({ category: value as GetCategoryDTO })}>
             <div className="flex flex-col flex-wrap gap-2 sm:flex-row sm:gap-4 lg:flex-col lg:gap-2">
               {CATEGORY_OPTIONS.map(category => (
                 <div key={category.value} className="flex items-center gap-2">
@@ -52,7 +74,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
         <div className="flex flex-col gap-6 sm:flex-row lg:flex-col">
           <div>
             <h3 className="font-semibold mb-2">Age Category</h3>
-            <Select value={age} onValueChange={value => onFilterChange({ category, age: value as GetAgeDTO, gender })}>
+            <Select value={age} onValueChange={value => onFilterChange({ age: value as GetAgeDTO })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Age" />
               </SelectTrigger>
@@ -67,10 +89,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
           </div>
           <div>
             <h3 className="font-semibold mb-2">Gender</h3>
-            <Select
-              value={gender}
-              onValueChange={value => onFilterChange({ category, age, gender: value as GetGenderDTO })}
-            >
+            <Select value={gender} onValueChange={value => onFilterChange({ gender: value as GetGenderDTO })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Gender" />
               </SelectTrigger>
@@ -82,6 +101,17 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+        <div>
+          <h3 className="font-semibold mb-2">Max Price</h3>
+          <div className={cn({ 'pointer-events-none opacity-80': maxProductPrice === null })}>
+            <LabeledSlider
+              value={[maxPrice || 0]}
+              max={maxProductPrice || 0}
+              onValueChange={value => setMaxPrice(value[0])}
+              formatLabel={value => `$${value}`}
+            />
           </div>
         </div>
       </div>

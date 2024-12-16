@@ -18,7 +18,7 @@ export const LabeledSlider: React.FC<LabeledSliderProps> = ({
   formatLabel = (value: number) => value,
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <Slider defaultValue={defaultValue} max={max} step={step} value={value} onValueChange={onValueChange} />
       <div className="text-center font-medium">{formatLabel(value[0])}</div>
     </div>

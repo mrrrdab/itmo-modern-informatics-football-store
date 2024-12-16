@@ -11,7 +11,8 @@ export const useCreateOrderMutation = () => {
     mutationFn: createOrder,
     retry: 3,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders', 'cart'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.refetchQueries({ queryKey: ['cart'] });
     },
   });
 };

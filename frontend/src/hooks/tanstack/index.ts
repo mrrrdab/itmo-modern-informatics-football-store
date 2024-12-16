@@ -3,6 +3,7 @@ export * from './useResendVerificationEmailQuery';
 export * from './useRecoverPasswordQuery';
 export * from './useGetProductsQuery';
 export * from './useGetProductQuery';
+export * from './useGetProductsByIdsQuery';
 export * from './useGetCartQuery';
 export * from './useGetCartProductsQuery';
 export * from './useGetOrdersQuery';

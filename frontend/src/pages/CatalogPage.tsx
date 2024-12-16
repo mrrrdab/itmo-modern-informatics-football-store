@@ -1,16 +1,9 @@
-/* eslint-disable max-len */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { FOOTBALL_CLUBS, FOOTBALL_CLUBS_LABELS } from '@/constants';
-import type {
-  ApiError,
-  GetAgeDTO,
-  GetCategoryDTO,
-  GetFootballClubDTO,
-  GetGenderDTO,
-  GetProductsQueryParams,
-} from '@/api';
+import type { ProductsFilters } from '@/types';
+import type { ApiError, GetAgeDTO, GetCategoryDTO, GetFootballClubDTO, GetGenderDTO } from '@/api';
 import { useGetCartQuery, useGetProductsQuery } from '@/hooks';
 import {
   ErrorMessage,
@@ -38,17 +31,35 @@ export const CatalogPage = () => {
     [queryParams],
   );
 
-  const [filters, setFilters] = useState<Omit<Required<GetProductsQueryParams>, 'maxPrice'>>(initialFilters);
+  const [filters, setFilters] = useState<ProductsFilters>(initialFilters);
 
-  const { data: products, isLoading: isLoadingProducts, error: errorProducts } = useGetProductsQuery(filters);
+  const [maxProductPrice, setMaxProductPrice] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+
+  const {
+    data: products,
+    isLoading: isLoadingProducts,
+    error: errorProducts,
+  } = useGetProductsQuery(maxPrice !== null ? { ...filters, maxPrice } : filters);
 
   const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartQuery();
 
-  const handleFilterChange = useCallback((data: GetProductsQueryParams) => {
+  useEffect(() => {
+    if (products) {
+      const maxProductPrice = Math.max(...products.map(product => product.price));
+      setMaxProductPrice(maxProductPrice);
+      setMaxPrice(maxProductPrice);
+    }
+  }, [products]);
+
+  const handleFilterChange = useCallback((data: Partial<ProductsFilters>) => {
     setFilters(prevState => ({
       ...prevState,
       ...data,
     }));
+
+    setMaxProductPrice(null);
+    setMaxPrice(null);
   }, []);
 
   return (
@@ -59,6 +70,9 @@ export const CatalogPage = () => {
             category={filters.category}
             age={filters.age}
             gender={filters.gender}
+            maxProductPrice={maxProductPrice}
+            maxPriceFilter={maxPrice}
+            setMaxPriceFilter={setMaxPrice}
             onFilterChange={handleFilterChange}
             onResetFilters={() => setFilters(DEFAULT_FILTERS)}
           />
@@ -119,7 +133,7 @@ export const CatalogPage = () => {
   );
 };
 
-const DEFAULT_FILTERS: Omit<Required<GetProductsQueryParams>, 'maxPrice'> = {
+const DEFAULT_FILTERS: ProductsFilters = {
   category: 'UPPER_CLOTHING',
   club: 'BAYERN_MUNICH',
   age: 'ADULT',
