@@ -33,7 +33,7 @@ export const AlertBase: React.FC = () => {
   return createPortal(
     <Alert
       variant={alertState.variant}
-      className="fixed top-20 left-1/2 w-[300px] transform -translate-x-1/2 flex gap-4 items-center lg:text-center lg:gap-2 lg:w-fit"
+      className="fixed top-20 left-1/2 w-[300px] z-50 transform -translate-x-1/2 flex gap-4 items-center lg:text-center lg:gap-2 lg:w-fit"
     >
       {alertState.variant === 'default' ? (
         <TickIcon className="max-w-5 h-5 flex-shrink-0" />

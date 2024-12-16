@@ -13,9 +13,7 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
       password: configService.get<string>('REDIS_PASSWORD'),
     });
 
-    try {
-      await client.connect();
-    } catch {}
+    await client.connect();
 
     return client;
   },

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { AGE_LABELS, APP_ROUTER, CATEGORY_LABELS, GENDER_LABELS, MODALS } from '@/constants';
-import type { ApiError, GetClothingSizeDTO, GetFootwearSizeDTO } from '@/api';
+import type { ApiError, GetClothingSizeDTO, GetFootwearSizeDTO, GetProductDTO } from '@/api';
 import {
   useAddProductsToCartMutation,
   useAlert,
@@ -36,13 +36,25 @@ export const ProductPage: React.FC = () => {
     return cart?.orderItems.filter(orderItem => orderItem.productId === id).map(orderItem => orderItem.size) || [];
   }, [cart?.orderItems, id]);
 
+  const validationSchema = useMemo(() => {
+    if (product) {
+      return getValidationSchema(product);
+    }
+
+    return z.object({});
+  }, [product]);
+
   const {
     watch,
     handleSubmit,
     control,
     formState: { errors },
     reset,
-  } = useForm<FormData>({ defaultValues: { sizes: [] }, resolver: zodResolver(validationSchema), mode: 'all' });
+  } = useForm<FormData>({
+    defaultValues: { sizes: [] },
+    resolver: zodResolver(validationSchema),
+    mode: 'all',
+  });
 
   const selectedSizes = watch('sizes');
 
@@ -68,10 +80,20 @@ export const ProductPage: React.FC = () => {
 
       if (id) {
         try {
-          const productData = data.sizes.map(size => ({
-            productId: id,
-            size: size as GetClothingSizeDTO | GetFootwearSizeDTO,
-          }));
+          let productData;
+
+          if (data.sizes.length) {
+            productData = data.sizes.map(size => ({
+              productId: id,
+              size: size as GetClothingSizeDTO | GetFootwearSizeDTO,
+            }));
+          } else {
+            productData = [
+              {
+                productId: id,
+              },
+            ];
+          }
 
           await addProductToCartMutation(productData);
           openAlert('Product added to cart!');
@@ -200,8 +222,16 @@ export const ProductPage: React.FC = () => {
   );
 };
 
-const validationSchema = z.object({
-  sizes: z.array(z.string()).nonempty('Select at least one product size'),
-});
+const getValidationSchema = (product: GetProductDTO) => {
+  if (product.category === 'ACCESSORIES') {
+    return z.object({
+      sizes: z.array(z.string()),
+    });
+  }
 
-type FormData = z.infer<typeof validationSchema>;
+  return z.object({
+    sizes: z.array(z.string()).nonempty('Select at least one product size'),
+  });
+};
+
+type FormData = z.infer<ReturnType<typeof getValidationSchema>>;

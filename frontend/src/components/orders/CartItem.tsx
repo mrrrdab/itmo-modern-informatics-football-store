@@ -74,7 +74,7 @@ export const CartItem: React.FC<CartItemProps> = ({
             onClick={handleViewProduct}
           />
         )}
-        <div className="flex flex-col justify-between flex-1 gap-4">
+        <div className="flex flex-col flex-1 gap-4">
           <div className="flex justify-between gap-8">
             <div className="flex flex-col gap-2">
               {isLoadingProduct ? (
