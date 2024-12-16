@@ -9,6 +9,7 @@ import { AGE_LABELS, APP_ROUTER, CATEGORY_LABELS, GENDER_LABELS, MODALS } from '
 import type { ApiError, GetClothingSizeDTO, GetFootwearSizeDTO } from '@/api';
 import {
   useAddProductsToCartMutation,
+  useAlert,
   useGetCartQuery,
   useGetProductQuery,
   useGetUserPayloadQuery,
@@ -21,6 +22,7 @@ export const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   const { openModal } = useModal();
+  const { openAlert } = useAlert();
 
   const { data: product, isLoading: isLoadingProduct, error: errorProduct } = useGetProductQuery(id);
 
@@ -28,7 +30,7 @@ export const ProductPage: React.FC = () => {
 
   const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartQuery();
 
-  const { mutateAsync: addProductMutation, isPending: isAddingProduct } = useAddProductsToCartMutation();
+  const { mutateAsync: addProductToCartMutation, isPending: isAddingProduct } = useAddProductsToCartMutation();
 
   const sizesInCart = useMemo(() => {
     return cart?.orderItems.filter(orderItem => orderItem.productId === id).map(orderItem => orderItem.size) || [];
@@ -65,16 +67,22 @@ export const ProductPage: React.FC = () => {
       }
 
       if (id) {
-        const productData = data.sizes.map(size => ({
-          productId: id,
-          size: size as GetClothingSizeDTO | GetFootwearSizeDTO,
-        }));
+        try {
+          const productData = data.sizes.map(size => ({
+            productId: id,
+            size: size as GetClothingSizeDTO | GetFootwearSizeDTO,
+          }));
 
-        await addProductMutation(productData);
-        reset();
+          await addProductToCartMutation(productData);
+          openAlert('Product added to cart!');
+          reset();
+        } catch (e) {
+          console.error('Error adding product to cart: ', e);
+          openAlert('Something went wrong!', 'destructive');
+        }
       }
     },
-    [addProductMutation, userData, id, openModal, reset],
+    [addProductToCartMutation, userData, id, openModal, openAlert, reset],
   );
 
   if (isLoadingProduct || isLoadingCart || isLoadingUser) {

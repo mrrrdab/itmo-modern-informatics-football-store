@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { APP_ROUTER } from '@/constants';
 import { useAlert, useDeleteCartItemMutation, useGetCartQuery, useUpdateCartItemQuantityMutation } from '@/hooks';
 import { cn } from '@/utils';
-import { Button, ErrorMessage, OrderItem, OrderSummary, Skeleton } from '@/components';
+import { Button, ErrorMessage, CartItem, OrderSummary, Skeleton } from '@/components';
 
 export const ShoppingCartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ export const ShoppingCartPage: React.FC = () => {
           <div className="flex-1 flex flex-col gap-4">
             {cart.orderItems.map(item => (
               <div key={item.id} className={cn({ 'opacity-80': isDeletingItem })}>
-                <OrderItem
+                <CartItem
                   key={item.id}
                   id={item.id}
                   productId={item.productId}

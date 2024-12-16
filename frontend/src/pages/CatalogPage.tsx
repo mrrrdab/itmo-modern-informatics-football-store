@@ -3,7 +3,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { FOOTBALL_CLUBS, FOOTBALL_CLUBS_LABELS } from '@/constants';
-import type { ApiError, GetAgeDTO, GetCategoryDTO, GetGenderDTO, GetProductsQueryParams } from '@/api';
+import type {
+  ApiError,
+  GetAgeDTO,
+  GetCategoryDTO,
+  GetFootballClubDTO,
+  GetGenderDTO,
+  GetProductsQueryParams,
+} from '@/api';
 import { useGetCartQuery, useGetProductsQuery } from '@/hooks';
 import {
   ErrorMessage,
@@ -24,13 +31,14 @@ export const CatalogPage = () => {
   const initialFilters = useMemo(
     () => ({
       category: (queryParams.get('category') as GetCategoryDTO) || DEFAULT_FILTERS.category,
+      club: (queryParams.get('club') as GetFootballClubDTO) || DEFAULT_FILTERS.club,
       age: (queryParams.get('age') as GetAgeDTO) || DEFAULT_FILTERS.age,
       gender: (queryParams.get('gender') as GetGenderDTO) || DEFAULT_FILTERS.gender,
     }),
     [queryParams],
   );
 
-  const [filters, setFilters] = useState<GetProductsQueryParams>(initialFilters);
+  const [filters, setFilters] = useState<Omit<Required<GetProductsQueryParams>, 'maxPrice'>>(initialFilters);
 
   const { data: products, isLoading: isLoadingProducts, error: errorProducts } = useGetProductsQuery(filters);
 
@@ -56,7 +64,7 @@ export const CatalogPage = () => {
           />
         </div>
         <div className="flex-1">
-          <Tabs defaultValue={FOOTBALL_CLUBS[0]}>
+          <Tabs value={filters.club} onValueChange={club => handleFilterChange({ club: club as GetFootballClubDTO })}>
             <TabsList className="mb-5 w-full overflow-auto">
               {FOOTBALL_CLUBS.map(club => (
                 <TabsTrigger key={club} value={club}>
@@ -111,8 +119,9 @@ export const CatalogPage = () => {
   );
 };
 
-const DEFAULT_FILTERS: GetProductsQueryParams = {
+const DEFAULT_FILTERS: Omit<Required<GetProductsQueryParams>, 'maxPrice'> = {
   category: 'UPPER_CLOTHING',
+  club: 'BAYERN_MUNICH',
   age: 'ADULT',
   gender: 'MEN',
 };

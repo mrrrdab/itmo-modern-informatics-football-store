@@ -1,7 +1,9 @@
-import type { GetAgeDTO, GetGenderDTO, GetCategoryDTO } from '@/api';
+import type { GetAgeDTO, GetGenderDTO, GetCategoryDTO, GetFootballClubDTO } from '@/api';
 
 export type GetProductsQueryParams = {
-  category: GetCategoryDTO;
-  age: GetAgeDTO;
-  gender: GetGenderDTO;
+  category?: GetCategoryDTO;
+  club?: GetFootballClubDTO;
+  age?: GetAgeDTO;
+  maxPrice?: number;
+  gender?: GetGenderDTO;
 };

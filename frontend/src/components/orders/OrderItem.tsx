@@ -1,144 +1,64 @@
-import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { APP_ROUTER } from '@/constants';
-import type { GetClothingSizeDTO, GetFootwearSizeDTO } from '@/api';
-import { useDebounce, useGetProductQuery } from '@/hooks';
-import { cn } from '@/utils';
-import DeleteIcon from '@/assets/icons/delete.svg?react';
+import { APP_ROUTER, ORDER_STATUSES_LABELS } from '@/constants';
+import type { GetOrderDTO } from '@/api';
+import { useGetCartProductsQuery } from '@/hooks';
+import { formatDate } from '@/utils';
 
-import { Button, Input, Skeleton } from '../shadcn';
+import { ErrorMessage } from '../common';
+import { Card, CardTitle, CardContent, CardHeader, Skeleton } from '../shadcn';
 
-type OrderItemProps = {
-  id: string;
-  productId: string;
-  total: number;
-  size?: GetFootwearSizeDTO | GetClothingSizeDTO;
-  quantity: number;
-  stockQuantity: number;
-  onQuantityChange: (id: string, quantity: number) => void;
-  onDelete: (id: string) => void;
-};
+type OrderItemProps = GetOrderDTO;
 
-export const OrderItem: React.FC<OrderItemProps> = ({
-  id,
-  productId,
-  total,
-  quantity,
-  stockQuantity,
-  onQuantityChange,
-  onDelete,
-}) => {
+export const OrderItem: React.FC<OrderItemProps> = ({ id, total, quantity, status, orderItems, createdAt }) => {
   const navigate = useNavigate();
 
-  const [updatedQuantity, setUpdatedQuantity] = useState(quantity);
-  const debouncedQuantity = useDebounce(updatedQuantity);
+  const productIds = orderItems.map(item => item.productId);
 
-  const { data: product, isLoading: isLoadingProduct } = useGetProductQuery(productId);
-
-  useEffect(() => {
-    if (debouncedQuantity !== quantity) {
-      onQuantityChange(id, debouncedQuantity);
-    }
-  }, [debouncedQuantity, id, onQuantityChange, quantity]);
-
-  const handleQuantityInput = useCallback(
-    (value: number) => {
-      if (value <= 1) {
-        setUpdatedQuantity(1);
-      } else if (value >= stockQuantity) {
-        setUpdatedQuantity(stockQuantity);
-      } else {
-        setUpdatedQuantity(value);
-      }
-    },
-    [stockQuantity],
-  );
-
-  const handleViewProduct = useCallback(() => {
-    navigate(`${APP_ROUTER.CATALOG}/${productId}`);
-  }, [productId, navigate]);
+  const {
+    data: products,
+    isLoading: isLoadingProducts,
+    isError: isErrorProducts,
+  } = useGetCartProductsQuery(productIds);
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center justify-between p-4 border-2 border-zinc-900 rounded-md">
-      <div className="flex gap-4 lg:w-3/5">
-        {isLoadingProduct ? (
-          <Skeleton className="w-20 h-20" />
-        ) : (
-          <img
-            src={product?.imageUrl}
-            alt={product?.name}
-            className="w-20 h-20 object-cover rounded-md cursor-pointer"
-            onClick={handleViewProduct}
-          />
-        )}
-        <div className="flex flex-col justify-between flex-1 gap-4">
-          <div className="flex justify-between gap-8">
-            <div className="flex flex-col gap-2">
-              {isLoadingProduct ? (
-                <Skeleton className="w-20 h-10" />
-              ) : (
-                <p className="font-semibold cursor-pointer max-w-[200px]" onClick={handleViewProduct}>
-                  {product?.name}
-                </p>
-              )}
-              <p className="font-semibold truncate lg:hidden">${total.toFixed(2)}</p>
-            </div>
-            <p
-              className={cn('text-end lg:hidden', {
-                'text-green-500': stockQuantity > 0,
-                'text-red-500': stockQuantity <= 0,
-              })}
-            >
-              {stockQuantity > 0 ? `In stock: ${stockQuantity}` : 'Out of stock'}
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => onDelete(id)}
-            className="w-fit py-1 px-2 hidden lg:block"
-          >
-            <DeleteIcon />
-          </Button>
+    <Card>
+      <CardHeader className="flex flex-row justify-between mb-2">
+        <div>
+          <CardTitle className="text-xl mb-1">Order #{id.slice(0, 6)}</CardTitle>
+          <p className="text-sm text-zinc-400">{formatDate(new Date(createdAt))}</p>
         </div>
-      </div>
-      <div className="flex justify-between items-end mt-6 lg:mt-0">
-        <div className="flex items-center gap-2 min-w-[140px]">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setUpdatedQuantity(updatedQuantity - 1)}
-            disabled={updatedQuantity <= 1}
-            className="min-w-9 p-3"
-          >
-            -
-          </Button>
-          <Input
-            value={updatedQuantity}
-            onChange={e => handleQuantityInput(Number(e.target.value))}
-            className="w-12 text-center border-none rounded-md hover:ring-2 hover:ring-zinc-900 max-w-12"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setUpdatedQuantity(updatedQuantity + 1)}
-            disabled={updatedQuantity >= stockQuantity}
-            className="min-w-9 p-3"
-          >
-            +
-          </Button>
-        </div>
-        <Button type="button" variant="ghost" onClick={() => onDelete(id)} className="w-fit py-1 px-2 lg:hidden">
-          <DeleteIcon />
-        </Button>
-      </div>
-      <div className="min-w-[100px] w-28 h-full hidden lg:flex lg:flex-col lg:gap-4 items-end">
-        <p className={cn('text-end', { 'text-green-500': stockQuantity > 0, 'text-red-500': stockQuantity <= 0 })}>
-          {stockQuantity > 0 ? `In stock: ${stockQuantity}` : 'Out of stock'}
+        <p className="text-lg font-semibold border-2 border-zinc-900 py-2 px-4 rounded-md h-fit">
+          {ORDER_STATUSES_LABELS[status]}
         </p>
-        <p className="font-semibold truncate">${total.toFixed(2)}</p>
-      </div>
-    </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-10 lg:flex-row lg:gap-14 lg:justify-between">
+        <div className="flex flex-wrap gap-4">
+          {isLoadingProducts ? (
+            Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="w-16 h-20 rounded-md" />)
+          ) : isErrorProducts || !products ? (
+            <ErrorMessage>Error Loading Products</ErrorMessage>
+          ) : (
+            products.map((product, index) => (
+              <img
+                key={index}
+                src={product.imageUrl}
+                alt={product.name}
+                className="w-16 h-20 object-cover cursor-pointer rounded-md"
+                onClick={() => navigate(`${APP_ROUTER.CATALOG}/${product.id}`)}
+              />
+            ))
+          )}
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <p className="text-right">
+            Items: <span className="font-semibold">{quantity}</span>
+          </p>
+          <p className="text-lg text-right">
+            Total: <span className="font-semibold">${total.toFixed(2)}</span>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

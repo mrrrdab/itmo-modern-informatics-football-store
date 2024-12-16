@@ -1,3 +1,3 @@
-export * from './OrderCard';
 export * from './OrderItem';
+export * from './CartItem';
 export * from './OrderSummary';

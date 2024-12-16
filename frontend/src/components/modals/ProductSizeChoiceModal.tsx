@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { MODALS } from '@/constants';
 import type { GetClothingSizeDTO, GetFootwearSizeDTO, GetProductVariantDTO } from '@/api';
-import { useAddProductsToCartMutation, useModal } from '@/hooks';
+import { useAddProductsToCartMutation, useAlert, useModal } from '@/hooks';
 
 import { Button } from '../shadcn';
 import { ErrorMessage, ModalBase, SizeOption } from '../common';
@@ -18,6 +18,7 @@ type ProductSizeChoiceModalType = {
 
 export const ProductSizeChoiceModal: React.FC = () => {
   const { getModalState, closeModal } = useModal();
+  const { openAlert } = useAlert();
 
   const modalArgs = getModalState<ProductSizeChoiceModalType>(MODALS.PRODUCT_SIZE_CHOICE).args;
 
@@ -43,17 +44,23 @@ export const ProductSizeChoiceModal: React.FC = () => {
   const onSubmit = useCallback(
     async (data: FormData) => {
       if (modalArgs?.productId) {
-        const productData = data.sizes.map(size => ({
-          productId: modalArgs.productId,
-          size: size as GetClothingSizeDTO | GetFootwearSizeDTO,
-        }));
+        try {
+          const productData = data.sizes.map(size => ({
+            productId: modalArgs.productId,
+            size: size as GetClothingSizeDTO | GetFootwearSizeDTO,
+          }));
 
-        await addProductMutation(productData);
-        handleModalClose();
-        reset();
+          await addProductMutation(productData);
+          handleModalClose();
+          openAlert('Product added to cart!');
+          reset();
+        } catch (e) {
+          console.error('Error adding product to cart: ', e);
+          openAlert('Something went wrong!', 'destructive');
+        }
       }
     },
-    [addProductMutation, handleModalClose, modalArgs?.productId, reset],
+    [addProductMutation, handleModalClose, modalArgs?.productId, openAlert, reset],
   );
 
   if (!modalArgs) {
@@ -73,8 +80,8 @@ export const ProductSizeChoiceModal: React.FC = () => {
                 {modalArgs.variants.map(variant => (
                   <SizeOption
                     key={variant.size}
-                    size={variant.size}
-                    isSelected={field.value.includes(variant.size)}
+                    size={variant.size!}
+                    isSelected={field.value.includes(variant.size!)}
                     onSelect={selectedSize => {
                       const newValue = field.value.includes(selectedSize)
                         ? field.value.filter(s => s !== selectedSize)

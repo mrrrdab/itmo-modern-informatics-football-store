@@ -16,7 +16,27 @@ export const getProduct = async (id: string): Promise<GetProductDTO> => {
 };
 
 export const getProducts = async (filters: GetProductsQueryParams): Promise<GetProductDTO[]> => {
-  const queryParams = new URLSearchParams(filters as Record<string, string>);
+  const queryParams = new URLSearchParams();
+
+  if (filters.category) {
+    queryParams.set('category', filters.category);
+  }
+
+  if (filters.age) {
+    queryParams.set('age', filters.age);
+  }
+
+  if (filters.gender) {
+    queryParams.set('gender', filters.gender);
+  }
+
+  if (filters.club) {
+    queryParams.set('club', filters.club);
+  }
+
+  if (filters.maxPrice !== undefined) {
+    queryParams.set('price[lt]', filters.maxPrice.toString());
+  }
 
   const response = await fetch(`${import.meta.env.VITE_API_DOMAIN}/products?${queryParams}`);
 

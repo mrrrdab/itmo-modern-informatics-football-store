@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { APP_ROUTER } from '@/constants';
 import type { ApiError } from '@/api';
 import { useGetOrdersQuery } from '@/hooks';
-import { Button, ErrorMessage, OrderCard, Skeleton } from '@/components';
+import { Button, ErrorMessage, OrderItem, Skeleton } from '@/components';
 
 export const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export const OrdersPage: React.FC = () => {
           )
         ) : (
           orders?.map(order => (
-            <OrderCard
+            <OrderItem
               key={order.id}
               id={order.id}
               total={order.total}
