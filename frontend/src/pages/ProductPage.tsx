@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { AGE_LABELS, APP_ROUTER, CATEGORY_LABELS, GENDER_LABELS, MODALS } from '@/constants';
-import type { ApiError, GetClothingSizeDTO, GetFootwearSizeDTO, GetProductDTO } from '@/api';
+import type { GetClothingSizeDTO, GetFootwearSizeDTO, GetProductDTO } from '@/api';
 import {
   useAddProductsToCartMutation,
   useAlert,
@@ -26,9 +26,9 @@ export const ProductPage: React.FC = () => {
 
   const { data: product, isLoading: isLoadingProduct, error: errorProduct } = useGetProductQuery(id);
 
-  const { data: userData, isLoading: isLoadingUser } = useGetUserPayloadQuery();
+  const { isLoading: isLoadingUser, error: errorUser } = useGetUserPayloadQuery();
 
-  const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartQuery();
+  const { data: cart, isLoading: isLoadingCart, error: errorCart } = useGetCartQuery();
 
   const { mutateAsync: addProductToCartMutation, isPending: isAddingProduct } = useAddProductsToCartMutation();
 
@@ -73,7 +73,7 @@ export const ProductPage: React.FC = () => {
 
   const onSubmit = useCallback(
     async (data: FormData) => {
-      if (!userData) {
+      if (errorUser && errorUser.status === 401) {
         openModal(MODALS.ACCOUNT_REQUIRED);
         return;
       }
@@ -104,8 +104,14 @@ export const ProductPage: React.FC = () => {
         }
       }
     },
-    [addProductToCartMutation, userData, id, openModal, openAlert, reset],
+    [addProductToCartMutation, errorUser, id, openModal, openAlert, reset],
   );
+
+  useEffect(() => {
+    if (errorProduct && errorProduct.status !== 404) {
+      openAlert('Something went wrong!', 'destructive');
+    }
+  }, [errorProduct, openAlert]);
 
   if (isLoadingProduct || isLoadingCart || isLoadingUser) {
     return (
@@ -124,8 +130,8 @@ export const ProductPage: React.FC = () => {
     );
   }
 
-  if (errorProduct || isErrorCart || !product || !cart) {
-    if ((errorProduct as ApiError)?.status === 404) {
+  if (errorProduct || (errorCart && errorCart.status !== 401) || !product) {
+    if (errorProduct?.status === 404) {
       return (
         <div className="flex justify-center items-center mt-10">
           <p className="text-zinc-400 text-lg">No Product found</p>

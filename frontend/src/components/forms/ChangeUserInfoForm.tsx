@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHookFormMask } from 'use-mask-input';
 import { z } from 'zod';
@@ -32,6 +32,7 @@ export const ChangeUserInfoForm: React.FC<ChangeUserInfoFormProps> = ({
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<FormData>({
     defaultValues: {
       firstName: userCurrentFirstName,
@@ -45,6 +46,18 @@ export const ChangeUserInfoForm: React.FC<ChangeUserInfoFormProps> = ({
   const registerWithMask = useHookFormMask(register);
 
   const { mutateAsync: updateCustomer, isPending: isUpdatingUser } = useUpdateCustomerInfoMutation();
+
+  const [isFormChanged, setIsFormChanged] = useState(false);
+
+  const firstName = watch('firstName');
+  const lastName = watch('lastName');
+  const phoneNumber = watch('phoneNumber');
+
+  useEffect(() => {
+    setIsFormChanged(
+      userCurrentFirstName !== firstName || userCurrentLastName !== lastName || userCurrentPhoneNumber !== phoneNumber,
+    );
+  }, [userCurrentFirstName, userCurrentLastName, userCurrentPhoneNumber, firstName, lastName, phoneNumber]);
 
   const onSubmit = useCallback(
     async (data: FormData) => {
@@ -94,7 +107,12 @@ export const ChangeUserInfoForm: React.FC<ChangeUserInfoFormProps> = ({
         </div>
       </div>
       <div className="flex flex-col gap-4 items-center">
-        <Button type="submit" variant="secondary" className="w-32">
+        <Button
+          type="submit"
+          variant="secondary"
+          className="w-32"
+          disabled={isUpdatingUser || !isFormChanged}
+        >
           Save Changes
         </Button>
         <Button type="button" variant="ghost" onClick={onCancel} className="w-32">
@@ -120,8 +138,8 @@ const validationSchema = z.object({
     .transform(val => val.trim()),
   phoneNumber: z
     .string()
-    .min(1, 'Phone Number is required')
-    .regex(PHONE_NUMBER_REGEX, 'Invalid Phone Number')
+    .min(1, 'Phone number is required')
+    .regex(PHONE_NUMBER_REGEX, 'Invalid phone number')
     .transform(val => val.trim()),
 });
 

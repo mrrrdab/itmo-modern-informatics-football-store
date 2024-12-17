@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import { useGetCartQuery } from '@/hooks';
+import { useAlert, useGetCartQuery } from '@/hooks';
 import { CheckoutForm, ErrorMessage, OrderSummary, Skeleton, SuccessfulOrderCreationModal } from '@/components';
 
 export const CheckoutPage: React.FC = () => {
+  const { openAlert } = useAlert();
+
   const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartQuery();
+
+  useEffect(() => {
+    if (isErrorCart) {
+      openAlert('Something went wrong!', 'destructive');
+    }
+  }, [isErrorCart, openAlert]);
 
   return (
     <React.Fragment>

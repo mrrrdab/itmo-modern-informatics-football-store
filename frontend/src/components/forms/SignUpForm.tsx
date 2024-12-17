@@ -159,19 +159,19 @@ const validationSchema = z
     email: z.string().min(1, 'Email is required').email('Invalid email address'),
     phoneNumber: z
       .string()
-      .min(1, 'Phone Number is required')
-      .regex(PHONE_NUMBER_REGEX, 'Invalid Phone Number')
+      .min(1, 'Phone number is required')
+      .regex(PHONE_NUMBER_REGEX, 'Invalid phone number')
       .transform(val => val.trim()),
     birthDate: z
       .string()
-      .min(1, 'Birth Date is required')
-      .regex(DATE_REGEX, 'Invalid Date')
+      .min(1, 'Birth date is required')
+      .regex(DATE_REGEX, 'Invalid date')
       .transform(value => parse(value, 'mm/dd/yyyy', new Date()))
-      .refine(value => isValid(value), { message: 'Invalid Date' })
+      .refine(value => isValid(value), { message: 'Invalid date' })
       .refine(
         value =>
           compareAsc(subYears(new Date(), 16), value) === 1 && compareAsc(subYears(new Date(), 100), value) === -1,
-        { message: 'Invalid Age' },
+        { message: 'Invalid age' },
       ),
     password: z
       .string()

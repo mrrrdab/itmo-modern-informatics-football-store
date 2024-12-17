@@ -12,6 +12,8 @@ export const useSignOutMutation = () => {
     retry: 1,
     onSuccess: () => {
       queryClient.resetQueries({ queryKey: ['user'] });
+      queryClient.resetQueries({ queryKey: ['cart'] });
+      queryClient.resetQueries({ queryKey: ['orders'] });
     },
   });
 };

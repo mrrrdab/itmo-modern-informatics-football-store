@@ -70,10 +70,12 @@ export const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ em
       } catch (e) {
         console.error('Error verifying email: ', e);
 
-        if ((e as ApiError).status === 401) {
+        const apiError = e as ApiError;
+
+        if (apiError.status === 401) {
           setError('token', { message: 'Token has been expired. Please request a new one.' });
-        } else if ((e as ApiError).status === 404) {
-          setError('token', { message: 'Invalid Token' });
+        } else if (apiError.status === 404) {
+          setError('token', { message: 'Invalid token' });
         } else {
           openAlert('Something went wrong!', 'destructive');
         }

@@ -1,14 +1,22 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import { APP_ROUTER } from '@/constants';
-import type { ApiError } from '@/api';
-import { useGetOrdersQuery } from '@/hooks';
+import { useAlert, useGetOrdersQuery } from '@/hooks';
 import { Button, ErrorMessage, OrderItem, Skeleton } from '@/components';
 
 export const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
 
+  const { openAlert } = useAlert();
+
   const { data: orders, isLoading: isLoadingOrders, error: errorOrders } = useGetOrdersQuery();
+
+  useEffect(() => {
+    if (errorOrders && errorOrders.status !== 404) {
+      openAlert('Something went wrong!', 'destructive');
+    }
+  }, [errorOrders, openAlert]);
 
   return (
     <div className="container mx-auto p-6">
@@ -20,9 +28,9 @@ export const OrdersPage: React.FC = () => {
         {isLoadingOrders ? (
           Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="h-32" />)
         ) : errorOrders || !orders ? (
-          (errorOrders as ApiError)?.status === 404 ? (
+          errorOrders?.status === 404 ? (
             <div className="flex flex-col gap-4 justify-center items-center mt-10">
-              <p className="text-zinc-400 text-lg">You do not have orders yet</p>
+              <p className="text-zinc-400 text-lg">You do not have orders yet!</p>
               <Button type="button" variant="secondary" onClick={() => navigate(APP_ROUTER.CATALOG)}>
                 Catalog
               </Button>

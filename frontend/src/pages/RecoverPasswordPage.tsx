@@ -1,7 +1,26 @@
 /* eslint-disable max-len */
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { RecoverPasswordForm } from '@/components';
+import { APP_ROUTER } from '@/constants';
+import { useGetUserPayloadQuery } from '@/hooks';
 
 export const RecoverPasswordPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const { data: userData } = useGetUserPayloadQuery();
+
+  useEffect(() => {
+    if (userData) {
+      navigate(APP_ROUTER.MAIN);
+    }
+  }, [navigate, userData]);
+
+  if (userData) {
+    return null;
+  }
+
   return (
     <div className="max-w-md mx-auto p-8">
       <h1 className="text-xl font-bold text-center mb-8">Password Recover</h1>

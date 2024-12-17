@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { APP_ROUTER } from '@/constants';
@@ -11,11 +11,17 @@ export const ShoppingCartPage: React.FC = () => {
 
   const { openAlert } = useAlert();
 
-  const { data: cart, isLoading, isError } = useGetCartQuery();
+  const { data: cart, isLoading: isLoadingCart, error: errorCart } = useGetCartQuery();
 
   const { mutateAsync: updateCartItemQuantity, isPending: isUpdatingItem } = useUpdateCartItemQuantityMutation();
 
   const { mutateAsync: deleteCartItemMutation, isPending: isDeletingItem } = useDeleteCartItemMutation();
+
+  useEffect(() => {
+    if (errorCart) {
+      openAlert('Something went wrong!', 'destructive');
+    }
+  }, [errorCart, openAlert]);
 
   const handleQuantityChange = useCallback(
     async (orderItemId: string, quantity: number) => {
@@ -54,7 +60,7 @@ export const ShoppingCartPage: React.FC = () => {
         <h2 className="text-xl font-bold mb-2">Shopping Cart</h2>
         <p className="font-semibold text-zinc-500">{cart?.orderItems.length} Products</p>
       </div>
-      {isLoading ? (
+      {isLoadingCart ? (
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="flex flex-col gap-4 flex-1">
             {Array.from({ length: 3 }).map((_, index) => (
@@ -63,7 +69,7 @@ export const ShoppingCartPage: React.FC = () => {
           </div>
           <Skeleton className="h-52 w-full lg:w-1/3" />
         </div>
-      ) : isError || !cart ? (
+      ) : errorCart || !cart ? (
         <div className="flex justify-center items-center mt-2 lg:mt-10">
           <ErrorMessage size="lg">Server Error</ErrorMessage>
         </div>

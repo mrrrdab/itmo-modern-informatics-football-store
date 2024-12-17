@@ -3,8 +3,8 @@ import { useLocation } from 'react-router-dom';
 
 import { FOOTBALL_CLUBS, FOOTBALL_CLUBS_LABELS, FOOTBALL_CLUBS_LOGOS } from '@/constants';
 import type { ProductsFilters } from '@/types';
-import type { ApiError, GetAgeDTO, GetCategoryDTO, GetFootballClubDTO, GetGenderDTO } from '@/api';
-import { useGetCartQuery, useGetProductsQuery } from '@/hooks';
+import type { GetAgeDTO, GetCategoryDTO, GetFootballClubDTO, GetGenderDTO } from '@/api';
+import { useAlert, useGetCartQuery, useGetProductsQuery } from '@/hooks';
 import {
   ErrorMessage,
   FiltersSection,
@@ -20,6 +20,8 @@ import {
 export const CatalogPage = () => {
   const location = useLocation();
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+
+  const { openAlert } = useAlert();
 
   const initialFilters = useMemo(
     () => ({
@@ -42,7 +44,7 @@ export const CatalogPage = () => {
     error: errorProducts,
   } = useGetProductsQuery(maxPrice !== null ? { ...filters, maxPrice } : filters);
 
-  const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartQuery();
+  const { data: cart, isLoading: isLoadingCart, error: errorCart } = useGetCartQuery();
 
   useEffect(() => {
     if (products) {
@@ -51,6 +53,12 @@ export const CatalogPage = () => {
       setMaxPrice(maxProductPrice);
     }
   }, [products]);
+
+  useEffect(() => {
+    if (errorProducts && errorProducts.status !== 404) {
+      openAlert('Something went wrong!', 'destructive');
+    }
+  }, [errorProducts, openAlert]);
 
   const handleFilterChange = useCallback((data: Partial<ProductsFilters>) => {
     setFilters(prevState => ({
@@ -77,7 +85,10 @@ export const CatalogPage = () => {
             maxPriceFilter={maxPrice}
             setMaxPriceFilter={setMaxPrice}
             onFilterChange={handleFilterChange}
-            onResetFilters={() => setFilters(DEFAULT_FILTERS)}
+            onResetFilters={() => {
+              setFilters(DEFAULT_FILTERS);
+              setMaxPrice(maxProductPrice);
+            }}
           />
         </div>
         <div className="flex-1">
@@ -97,8 +108,8 @@ export const CatalogPage = () => {
                       <Skeleton key={index} className="h-[300px] rounded-lg" />
                     ))}
                   </div>
-                ) : errorProducts || isErrorCart || !products || !cart ? (
-                  (errorProducts as ApiError)?.status === 404 ? (
+                ) : errorProducts || (errorCart && errorCart.status !== 401) || !products ? (
+                  errorProducts?.status === 404 ? (
                     <div className="flex justify-center items-center mt-2 lg:mt-10">
                       <p className="text-zinc-400 text-lg">No Products found matching these Criteria</p>
                     </div>
@@ -121,7 +132,7 @@ export const CatalogPage = () => {
                           description={product.description}
                           price={product.price}
                           variants={product.variants}
-                          isInCart={!!cart.orderItems.find(orderItem => orderItem.productId === product.id)}
+                          isInCart={!!cart?.orderItems.find(orderItem => orderItem.productId === product.id)}
                         />
                       ))}
                   </div>

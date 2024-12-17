@@ -2,12 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { APP_ROUTER } from '@/constants';
-import type { ApiError } from '@/api';
 import { useGetUserPayloadQuery } from '@/hooks';
 import LogoIcon from '@/assets/icons/logo.svg?react';
 import CartIcon from '@/assets/icons/cart.svg?react';
 
-import { Button, Skeleton } from '../shadcn';
+import { Button } from '../shadcn';
 
 import { QuickAccessDropdown } from './QuickAccessDropdown';
 
@@ -22,12 +21,12 @@ export const Header = () => {
           Bundestore
         </Link>
         <div className="flex gap-2">
-          {isLoadingUser ? (
-            <Skeleton className="rounded-full w-10 h-10" />
-          ) : errorUser && (errorUser as ApiError).status === 401 ? (
+          {isLoadingUser || (errorUser && errorUser.status === 401) ? (
             <React.Fragment>
               <Link to={APP_ROUTER.SIGN_IN}>
-                <Button type="button">Sign In</Button>
+                <Button type="button">
+                  Sign In
+                </Button>
               </Link>
               <Link to={APP_ROUTER.SIGN_UP}>
                 <Button type="button" variant="ghost">

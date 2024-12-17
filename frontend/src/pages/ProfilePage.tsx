@@ -47,7 +47,7 @@ export const ProfilePage = () => {
           />
           <div className="flex flex-col gap-4 items-center">
             <Button type="button" variant="secondary" className="w-32" onClick={() => setIsEditingMainInfo(true)}>
-              Edit Main Info
+              Edit User Info
             </Button>
             <Button type="button" variant="ghost" className="w-32" onClick={() => setIsEditingPassword(true)}>
               Change Password

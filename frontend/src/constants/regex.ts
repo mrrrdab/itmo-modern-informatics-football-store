@@ -1,4 +1,4 @@
-export const NAME_REGEX = /^[A-Za-zА-Яа-яЁё-]+$/;
+export const NAME_REGEX = /^[A-Za-zА-Яа-яЁё]+(?:[-\s][A-Za-zА-Яа-яЁё]+)*$/;
 
 export const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])/;
 

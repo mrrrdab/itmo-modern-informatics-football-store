@@ -30,7 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { data: userData } = useGetUserPayloadQuery();
+  const { error: errorUser } = useGetUserPayloadQuery();
 
   const { mutateAsync: addProductToCartMutation, isPending: isAddingProduct } = useAddProductsToCartMutation();
 
@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const { openAlert } = useAlert();
 
   const handleAddProduct = useCallback(async () => {
-    if (!userData) {
+    if (errorUser && errorUser.status === 401) {
       openModal(MODALS.ACCOUNT_REQUIRED);
       return;
     }
@@ -54,7 +54,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         openAlert('Something went wrong!', 'destructive');
       }
     }
-  }, [addProductToCartMutation, id, openAlert, openModal, userData, variants, category]);
+  }, [addProductToCartMutation, id, openAlert, openModal, errorUser, variants, category]);
 
   const handleViewProduct = () => {
     navigate(`${APP_ROUTER.CATALOG}/${id}`);

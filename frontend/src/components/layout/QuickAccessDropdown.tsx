@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { APP_ROUTER } from '@/constants';
-import { useGetUserPayloadQuery, useSignOutMutation } from '@/hooks';
+import { useAlert, useGetUserPayloadQuery, useSignOutMutation } from '@/hooks';
 import { cn } from '@/utils';
 import EditIcon from '@/assets/icons/edit.svg?react';
 
@@ -21,15 +21,22 @@ import { ErrorMessage } from '../common';
 export const QuickAccessDropdown: React.FC = () => {
   const navigate = useNavigate();
 
+  const { openAlert } = useAlert();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const { data: userData, isLoading: isLoadingUserData, isError: isErrorUserData } = useGetUserPayloadQuery();
   const { mutateAsync: signOutMutation, isPending: isSigningOut } = useSignOutMutation();
 
   const handleSignOut = useCallback(async () => {
-    await signOutMutation();
-    setIsOpen(false);
-  }, [signOutMutation]);
+    try {
+      await signOutMutation();
+      setIsOpen(false);
+    } catch (e) {
+      console.error('Error signing out: ', e);
+      openAlert('Something went wrong!', 'destructive');
+    }
+  }, [signOutMutation, openAlert]);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>

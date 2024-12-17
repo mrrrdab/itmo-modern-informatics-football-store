@@ -6,9 +6,9 @@ import { useGetUserPayloadQuery } from '@/hooks';
 export const ProtectedRoute: React.FC<React.PropsWithChildren> = ({ children }) => {
   const location = useLocation();
 
-  const { data: userData } = useGetUserPayloadQuery();
+  const { error: errorUser } = useGetUserPayloadQuery();
 
-  if (!userData) {
+  if (errorUser && errorUser.status === 401) {
     return <Navigate to={APP_ROUTER.SIGN_IN} state={{ from: location }} replace />;
   }
 

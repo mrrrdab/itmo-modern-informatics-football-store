@@ -28,7 +28,7 @@ export const RecoverPasswordForm: React.FC = () => {
 
   const email = watch('email');
 
-  const { refetch: recoverPassword, isLoading: isRecoveringPassword } = useRecoverPasswordQuery(email);
+  const { refetch: recoverPassword, isFetching: isRecoveringPassword } = useRecoverPasswordQuery(email);
 
   const onSubmit = useCallback(async () => {
     if (resendCooldown === 0) {
@@ -86,7 +86,7 @@ export const RecoverPasswordForm: React.FC = () => {
 };
 
 const validationSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
 });
 
 type FormData = z.infer<typeof validationSchema>;
