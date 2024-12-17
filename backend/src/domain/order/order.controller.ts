@@ -1,19 +1,24 @@
 import { Controller, Get, Post, Res, Req, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 import { Role } from '@prisma/client';
 
-import { UseRole } from '@/utils';
+import { UseRole, MailerProvider } from '@/utils';
 
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { IUserPayload } from '../user';
 import { CustomerService } from '../user/entity/customer/customer.service';
+
 import { CartRelations } from '../cart/types';
 import { CartService } from '../cart';
 
+import { OrderEmailSubject } from './types/order.email.subject.enum';
 import { OrderFilter } from './service/order.filter';
 import { OrderAggregate } from './service/order.aggregate';
+import { OrderEmailTemplate } from './service/order.email.template';
 
 @ApiTags('Orders')
 @Controller('api/orders')
@@ -21,11 +26,14 @@ import { OrderAggregate } from './service/order.aggregate';
 @UseRole(Role.CUSTOMER)
 export class OrderController {
   constructor(
+    private readonly configService: ConfigService,
     private readonly orderFilter: OrderFilter,
     private readonly orderAggregate: OrderAggregate,
+    private readonly orderEmailTemplate: OrderEmailTemplate,
     private readonly customerService: CustomerService,
     private readonly cartService: CartService,
-  ) {}
+    private readonly mailer: MailerProvider,
+  ) { }
 
   @ApiOperation({ summary: 'Get user orders' })
   @ApiResponse({ status: 200, description: 'User orders' })
@@ -68,19 +76,48 @@ export class OrderController {
 
     const cart = (await this.cartService.getByUniqueParams({
       where: {
-        customerId: customer.id,
+        customerId: customer.id
       },
-      include: this.orderFilter.getOrderInclude(),
+      include: {
+        orderItems: {
+          select: {
+            id: true,
+            total: true,
+            quantity: true,
+            size: true,
+            productId: true
+          }
+        }
+      }
     })) as CartRelations;
 
     if (!cart.orderItems || (cart.orderItems && cart.orderItems.length === 0)) {
       return res.status(404).send('Cart is empty');
     }
 
-    await this.orderAggregate.applyCreateOrderTransaction(cart.id, {
+    const order = await this.orderAggregate.applyCreateOrderTransaction(cart, {
       total: Number(cart.total),
       quantity: cart.quantity,
       customerId: customer.id,
+    });
+
+    await this.mailer.getTransporter().sendMail({
+      to: this.configService.get('MANAGER_EMAIL'),
+      subject: this.orderEmailTemplate.getEmailSubject(OrderEmailSubject.purchase),
+      html: this.orderEmailTemplate.createPurchaseEmail({
+        orderId: order.id,
+        total: order.total,
+        quantity: order.quantity,
+        status: order.status,
+        createdAt: order.createdAt,
+        userId: user.id,
+        customerId: customer.id,
+        customerFullName: `${customer.firstName} ${customer.lastName}`,
+        customerEmail: user.email,
+        customerPhoneNumber: customer.phoneNumber,
+        customerBirthDate: customer.birthDate,
+        orderItems: cart.orderItems
+      }),
     });
 
     res.status(200).send('New order successfully created');

@@ -46,12 +46,4 @@ export class CartFilter {
 
     return result;
   }
-
-  public async querySQLCheckStockQuantity() {
-    const result = await this.prismaService.$queryRaw`
-
-    `;
-
-    return result;
-  }
 }
