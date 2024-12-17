@@ -3,16 +3,16 @@ import { PrismaClient, Order, Prisma } from '@prisma/client';
 import { ITXClientDenyList } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '@/database/prisma';
+import { CartRelations } from '@/domain/cart/types';
 
 import { OrderCreateDTO } from '../dto';
-import { CartRelations } from '@/domain/cart/types';
 
 @Injectable()
 export class OrderAggregate {
   constructor(private readonly prismaService: PrismaService) {}
 
   public async applyCreateOrderTransaction(cart: CartRelations, orderCreateData: OrderCreateDTO): Promise<Order> {
-    return (await this.prismaService.$transaction(async (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
+    return await this.prismaService.$transaction(async (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
       const order = await prisma.order.create({
         data: orderCreateData,
       });
@@ -71,6 +71,6 @@ export class OrderAggregate {
         SELECT 1;`;
 
       return order;
-    }));
+    });
   }
 }

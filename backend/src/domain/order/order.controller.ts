@@ -2,7 +2,6 @@ import { Controller, Get, Post, Res, Req, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
 import { Role } from '@prisma/client';
 
 import { UseRole, MailerProvider } from '@/utils';
@@ -11,7 +10,6 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { IUserPayload } from '../user';
 import { CustomerService } from '../user/entity/customer/customer.service';
-
 import { CartRelations } from '../cart/types';
 import { CartService } from '../cart';
 
@@ -33,7 +31,7 @@ export class OrderController {
     private readonly customerService: CustomerService,
     private readonly cartService: CartService,
     private readonly mailer: MailerProvider,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Get user orders' })
   @ApiResponse({ status: 200, description: 'User orders' })
@@ -76,7 +74,7 @@ export class OrderController {
 
     const cart = (await this.cartService.getByUniqueParams({
       where: {
-        customerId: customer.id
+        customerId: customer.id,
       },
       include: {
         orderItems: {
@@ -85,10 +83,10 @@ export class OrderController {
             total: true,
             quantity: true,
             size: true,
-            productId: true
-          }
-        }
-      }
+            productId: true,
+          },
+        },
+      },
     })) as CartRelations;
 
     if (!cart.orderItems || (cart.orderItems && cart.orderItems.length === 0)) {
@@ -116,7 +114,7 @@ export class OrderController {
         customerEmail: user.email,
         customerPhoneNumber: customer.phoneNumber,
         customerBirthDate: customer.birthDate,
-        orderItems: cart.orderItems
+        orderItems: cart.orderItems,
       }),
     });
 

@@ -1,3 +1,3 @@
 export enum OrderEmailSubject {
-  purchase = 'purchase'
+  purchase = 'purchase',
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { EmailTemplate } from '@/abstract/email';
+
 import { IOrderData } from '../types/order.data.interface';
 import { OrderEmailSubject } from '../types/order.email.subject.enum';
 
@@ -19,7 +20,7 @@ export class OrderEmailTemplate extends EmailTemplate {
   }
 
   public createPurchaseEmail(orderData: IOrderData): string {
-    let purchaseEmail: string = `<p>The customer has placed a <strong>new order ${orderData.createdAt}</strong></p>
+    const purchaseEmail: string = `<p>The customer has placed a <strong>new order ${orderData.createdAt}</strong></p>
     <p><strong>Order Details</strong>:</p>`;
 
     return this.generateListHTML(orderData, purchaseEmail);

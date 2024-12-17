@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { EmailBasicSubjects, IEmailBasic } from './types';
 
 export abstract class EmailTemplate {
@@ -26,8 +27,7 @@ export abstract class EmailTemplate {
 
         curString += '</li>';
         return;
-      }
-      else if (value && value.constructor === Object) {
+      } else if (value && value.constructor === Object) {
         curString += `<li style="margin-bottom: ${marginBottom}px;"><strong>${key}</strong>: ${this.generateListHTML(value, '')}</li>`;
         return;
       }
