@@ -113,6 +113,12 @@ export const ProductPage: React.FC = () => {
     }
   }, [errorProduct, openAlert]);
 
+  useEffect(() => {
+    if (errorUser && errorUser.status === 401) {
+      reset({ sizes: [] });
+    }
+  }, [errorUser, reset]);
+
   if (isLoadingProduct || isLoadingCart || isLoadingUser) {
     return (
       <div className="container mx-auto p-6">

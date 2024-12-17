@@ -107,12 +107,7 @@ export const ChangeUserInfoForm: React.FC<ChangeUserInfoFormProps> = ({
         </div>
       </div>
       <div className="flex flex-col gap-4 items-center">
-        <Button
-          type="submit"
-          variant="secondary"
-          className="w-32"
-          disabled={isUpdatingUser || !isFormChanged}
-        >
+        <Button type="submit" variant="secondary" className="w-32" disabled={isUpdatingUser || !isFormChanged}>
           Save Changes
         </Button>
         <Button type="button" variant="ghost" onClick={onCancel} className="w-32">

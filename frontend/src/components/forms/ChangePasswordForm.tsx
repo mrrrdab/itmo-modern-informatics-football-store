@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { PASSWORD_REGEX } from '@/constants';
-import { useAlert, useUpdateUserInfoMutation } from '@/hooks';
+import { useAlert, useSignOutMutation, useUpdateUserInfoMutation } from '@/hooks';
 import { cn } from '@/utils';
 
 import { Button, Label } from '../shadcn';
@@ -27,14 +27,16 @@ export const ChangeUserPasswordForm: React.FC<ChangeUserPasswordFormProps> = ({ 
   });
 
   const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdateUserInfoMutation();
+  const { mutateAsync: signOutMutation, isPending: isSigningOut } = useSignOutMutation();
 
   const onSubmit = async (data: FormData) => {
     try {
       await updateUser({ password: data.password });
       openAlert('Your password has been updated successfully!');
+      await signOutMutation();
       onUserPasswordChange();
     } catch (e) {
-      console.error('Error updating profile:', e);
+      console.error('Error updating profile/Signing out:', e);
       openAlert('Something went wrong!', 'destructive');
     }
   };
@@ -43,7 +45,7 @@ export const ChangeUserPasswordForm: React.FC<ChangeUserPasswordFormProps> = ({ 
     <form
       autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
-      className={cn('flex flex-col gap-6', { ['pointer-events-none opacity-80']: isUpdatingUser })}
+      className={cn('flex flex-col gap-6', { ['pointer-events-none opacity-80']: isUpdatingUser || isSigningOut })}
     >
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 flex flex-col gap-2">

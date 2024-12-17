@@ -24,9 +24,7 @@ export const Header = () => {
           {isLoadingUser || (errorUser && errorUser.status === 401) ? (
             <React.Fragment>
               <Link to={APP_ROUTER.SIGN_IN}>
-                <Button type="button">
-                  Sign In
-                </Button>
+                <Button type="button">Sign In</Button>
               </Link>
               <Link to={APP_ROUTER.SIGN_UP}>
                 <Button type="button" variant="ghost">
