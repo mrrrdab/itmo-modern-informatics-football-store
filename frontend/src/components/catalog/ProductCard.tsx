@@ -30,7 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { error: errorUser } = useGetUserPayloadQuery();
+  const { isFetching: isLoadingUser, error: errorUser } = useGetUserPayloadQuery();
 
   const { mutateAsync: addProductToCartMutation, isPending: isAddingProduct } = useAddProductsToCartMutation();
 
@@ -76,7 +76,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             In Cart
           </Button>
         ) : (
-          <Button type="button" variant="ghost" onClick={handleAddProduct} disabled={isAddingProduct}>
+          <Button type="button" variant="ghost" onClick={handleAddProduct} disabled={isAddingProduct || isLoadingUser}>
             Add to Cart
           </Button>
         )}

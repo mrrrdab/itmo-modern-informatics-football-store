@@ -1,13 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { useGetUserPayloadQuery } from '@/hooks';
+import { useAlert, useGetUserPayloadQuery } from '@/hooks';
 import { Button, ChangeUserInfoForm, ChangeUserPasswordForm, ErrorMessage, Skeleton, UserInfo } from '@/components';
 
 export const ProfilePage = () => {
+  const { openAlert } = useAlert();
+
   const [isEditingMainInfo, setIsEditingMainInfo] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
 
-  const { data: userData, isLoading: isLoadingUser, isError: isErrorUser } = useGetUserPayloadQuery();
+  const { data: userData, isLoading: isLoadingUser, error: errorUser } = useGetUserPayloadQuery();
+
+  useEffect(() => {
+    if (errorUser) {
+      openAlert('Something went wrong!', 'destructive');
+    }
+  }, [errorUser, openAlert]);
 
   return (
     <div className="max-w-2xl mx-auto p-8">
@@ -19,7 +27,7 @@ export const ProfilePage = () => {
       </div>
       {isLoadingUser ? (
         <Skeleton className="h-64 w-full" />
-      ) : isErrorUser || !userData ? (
+      ) : errorUser || !userData ? (
         <div className="flex justify-center items-center mt-2 lg:mt-10">
           <ErrorMessage size="lg">Server Error</ErrorMessage>
         </div>

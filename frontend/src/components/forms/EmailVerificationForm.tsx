@@ -34,7 +34,7 @@ export const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ em
 
   const { mutateAsync: verifyEmailMutation, isPending: isVerifyingEmail } = useVerifyEmailMutation();
 
-  const { refetch: resendEmail, isLoading: isResendingEmail } = useResendVerificationEmailQuery(email);
+  const { refetch: resendEmail, isFetching: isResendingEmail } = useResendVerificationEmailQuery(email);
 
   const handleResendEmail = useCallback(async () => {
     if (resendCooldown === 0) {
