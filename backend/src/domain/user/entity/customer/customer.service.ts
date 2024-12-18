@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Customer } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '@/database/prisma';
 
 @Injectable()
 export class CustomerService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   public async getMany(params: Prisma.CustomerFindManyArgs): Promise<Customer[]> {
     const customers = await this.prismaService.customer.findMany(params);
@@ -22,27 +23,24 @@ export class CustomerService {
     return customer;
   }
 
-  /*public async create(customerCreateData: CustomerCreateDTO): Promise<Customer> {
-    const newCustomer = await this.prismaService.customer.create({
-      data: customerCreateData,
-    });
-
-    return newCustomer;
-  }*/
-
   public async update(
     customer: Prisma.CustomerWhereUniqueInput,
     customerUpdateData: Prisma.CustomerUpdateInput,
   ): Promise<Customer> {
-    const updatedCustomer = await this.prismaService.customer.update({
-      where: customer,
-      data: customerUpdateData,
-    });
+    try {
+      const updatedCustomer = await this.prismaService.customer.update({
+        where: customer,
+        data: customerUpdateData,
+      });
 
-    if (!updatedCustomer) {
-      throw new NotFoundException('Customer not found');
+      return updatedCustomer;
     }
+    catch (err) {
+      if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw new NotFoundException("Customer to update not found");
+      }
 
-    return updatedCustomer;
+      throw err;
+    }
   }
 }

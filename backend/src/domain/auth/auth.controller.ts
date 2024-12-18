@@ -222,6 +222,7 @@ export class AuthController {
     if (new Date(emailVerif.expiresAt) < new Date()) {
       emailVerif = await this.emailVerifService.update(emailVerif.id, {
         verifToken: this.crypto.generateSecureVerifToken(6),
+        expiresAt: new Date(Date.now() + 3600000),
       });
     }
 

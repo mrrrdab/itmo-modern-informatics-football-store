@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Product } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '@/database/prisma';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   public async getAll(filterOptions: Prisma.ProductFindManyArgs): Promise<Product[]> {
     const products = await this.prismaService.product.findMany(filterOptions);
@@ -27,7 +28,16 @@ export class ProductService {
   }
 
   public async update(productUpdateData: Prisma.ProductUpdateArgs): Promise<Product> {
-    const updatedProduct = await this.prismaService.product.update(productUpdateData);
-    return updatedProduct;
+    try {
+      const updatedProduct = await this.prismaService.product.update(productUpdateData);
+      return updatedProduct;
+    }
+    catch (err) {
+      if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw new NotFoundException("Product to update not found");
+      }
+
+      throw err;
+    }
   }
 }

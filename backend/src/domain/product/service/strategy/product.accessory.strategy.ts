@@ -16,7 +16,10 @@ export class ProductAccessoryStrategy implements IProductFilterStrategy {
         p.category,
         p.age,
         p.gender,
-        JSON_AGG(JSON_BUILD_OBJECT('stockQuantity', rel_mod."stockQuantity")) AS variants
+        JSON_AGG(JSON_BUILD_OBJECT(
+          'accessoryId', rel_mod.id,
+          'stockQuantity', rel_mod."stockQuantity"
+        )) AS variants
       FROM
         public."Product" p
       INNER JOIN

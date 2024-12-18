@@ -19,9 +19,20 @@ export class ProductStandardStrategy implements IProductFilterStrategy {
         COALESCE(
           JSON_AGG(
             CASE
-              WHEN c.id IS NOT NULL THEN JSON_BUILD_OBJECT('size', c.size, 'stockQuantity', c."stockQuantity")
-              WHEN f.id IS NOT NULL THEN JSON_BUILD_OBJECT('size', f.size, 'stockQuantity', f."stockQuantity")
-              WHEN a.id IS NOT NULL THEN JSON_BUILD_OBJECT('stockQuantity', a."stockQuantity")
+              WHEN c.id IS NOT NULL THEN JSON_BUILD_OBJECT(
+                'clothingId', c.id,
+                'size', c.size,
+                'stockQuantity', c."stockQuantity"
+              )
+              WHEN f.id IS NOT NULL THEN JSON_BUILD_OBJECT(
+                'footwearId', f.id,
+                'size', f.size,
+                'stockQuantity', f."stockQuantity"
+              )
+              WHEN a.id IS NOT NULL THEN JSON_BUILD_OBJECT(
+                'accessoryId', a.id,
+                'stockQuantity', a."stockQuantity"
+              )
               ELSE NULL
             END
           ),
