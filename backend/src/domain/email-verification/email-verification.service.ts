@@ -8,7 +8,7 @@ import { EmailVerifCreateDTO, EmailVerifUpdateDTO } from './dto';
 
 @Injectable()
 export class EmailVerifService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async getMany(params: Prisma.EmailVerificationFindManyArgs) {
     const emailVerifications = await this.prismaService.emailVerification.findMany(params);
@@ -43,10 +43,9 @@ export class EmailVerifService {
       });
 
       return updatedEmailVerif;
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("Email verification to update not found");
+        throw new NotFoundException('Email verification to update not found');
       }
 
       throw err;

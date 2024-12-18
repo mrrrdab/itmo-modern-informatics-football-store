@@ -8,7 +8,7 @@ import { ClothingCreateDTO } from './dto/clothing.create.dto';
 
 @Injectable()
 export class ClothingService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async create(clothingCreateData: ClothingCreateDTO): Promise<Clothing> {
     const newClothing = await this.prismaService.clothing.create({
@@ -22,10 +22,9 @@ export class ClothingService {
     try {
       const updatedClothing = await this.prismaService.clothing.update(clothingUpdateData);
       return updatedClothing;
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("Clothing to update not found");
+        throw new NotFoundException('Clothing to update not found');
       }
 
       throw err;

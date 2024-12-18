@@ -12,7 +12,7 @@ export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly crypto: CryptoProvider,
-  ) { }
+  ) {}
 
   private readonly userUpdateFilter: Partial<keyof User>[] = ['password'];
 
@@ -54,10 +54,9 @@ export class UserService {
       });
 
       return updatedUser;
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("User to update not found");
+        throw new NotFoundException('User to update not found');
       }
 
       throw err;
@@ -71,10 +70,9 @@ export class UserService {
           id: userId,
         },
       });
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("User to delete not found");
+        throw new NotFoundException('User to delete not found');
       }
 
       throw err;

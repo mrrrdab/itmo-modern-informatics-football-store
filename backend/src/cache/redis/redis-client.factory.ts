@@ -15,9 +15,8 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
 
     try {
       await client.connect();
-    }
-    catch(err) {
-      console.log(err);
+    } catch (err) {
+      console.error(err);
     }
 
     return client;

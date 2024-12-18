@@ -6,7 +6,7 @@ import { PrismaService } from '@/database/prisma';
 
 @Injectable()
 export class OrderItemService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async getByUniqueParams(uniqueParams: Prisma.OrderItemFindUniqueArgs): Promise<OrderItem> {
     const orderItem = await this.prismaService.orderItem.findUnique(uniqueParams);
@@ -22,10 +22,9 @@ export class OrderItemService {
     try {
       const updatedOrderItem = await this.prismaService.orderItem.update(orderItemUpdateData);
       return updatedOrderItem;
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("Order item to update not found");
+        throw new NotFoundException('Order item to update not found');
       }
 
       throw err;

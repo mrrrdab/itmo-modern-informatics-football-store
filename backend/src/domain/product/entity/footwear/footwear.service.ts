@@ -8,7 +8,7 @@ import { FootwearCreateDTO } from './dto/footwear.create.dto';
 
 @Injectable()
 export class FootwearService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async create(footwearCreateData: FootwearCreateDTO): Promise<Footwear> {
     const newFootwear = await this.prismaService.footwear.create({
@@ -22,10 +22,9 @@ export class FootwearService {
     try {
       const updatedFootwear = await this.prismaService.footwear.update(footwearUpdateData);
       return updatedFootwear;
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("Footwear to update not found");
+        throw new NotFoundException('Footwear to update not found');
       }
 
       throw err;

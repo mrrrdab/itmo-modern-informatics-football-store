@@ -6,7 +6,7 @@ import { PrismaService } from '@/database/prisma';
 
 @Injectable()
 export class CustomerService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async getMany(params: Prisma.CustomerFindManyArgs): Promise<Customer[]> {
     const customers = await this.prismaService.customer.findMany(params);
@@ -34,10 +34,9 @@ export class CustomerService {
       });
 
       return updatedCustomer;
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("Customer to update not found");
+        throw new NotFoundException('Customer to update not found');
       }
 
       throw err;

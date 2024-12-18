@@ -8,7 +8,7 @@ import { AccessoryCreateDTO } from './dto/accessory.create.dto';
 
 @Injectable()
 export class AccessoryService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   public async create(accessoryCreateData: AccessoryCreateDTO): Promise<Accessory> {
     const newAccessory = await this.prismaService.accessory.create({
@@ -22,10 +22,9 @@ export class AccessoryService {
     try {
       const updatedAccessory = await this.prismaService.accessory.update(accessoryUpdateData);
       return updatedAccessory;
-    }
-    catch(err) {
+    } catch (err) {
       if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException("Accessory to update not found");
+        throw new NotFoundException('Accessory to update not found');
       }
 
       throw err;
