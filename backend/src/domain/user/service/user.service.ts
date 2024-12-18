@@ -65,11 +65,20 @@ export class UserService {
   }
 
   public async remove(userId: string): Promise<void> {
-    await this.prismaService.user.delete({
-      where: {
-        id: userId,
-      },
-    });
+    try {
+      await this.prismaService.user.delete({
+        where: {
+          id: userId,
+        },
+      });
+    }
+    catch (err) {
+      if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw new NotFoundException("User to delete not found");
+      }
+
+      throw err;
+    }
   }
 
   public getUpdateFilter(): Partial<keyof User>[] {

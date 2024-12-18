@@ -111,7 +111,7 @@ model Cart {
   createdAt  DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime    @updatedAt @db.Timestamptz(3)
   customerId String      @unique @db.Uuid
-  customer   Customer    @relation(fields: [customerId], references: [id])
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 }
 
